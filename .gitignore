@@ -1,0 +1,17 @@
+*.mat
+*.p 
+*.slx 
+*.mdl 
+*.mdlp 
+*.slxp 
+*.sldd 
+*.mexa64 
+*.mexw32 
+*.mexw64 
+*.mexmaci64 
+*.xlsx 
+*.docx 
+*.pdf 
+*.jpg 
+*.png 
+*.eps
