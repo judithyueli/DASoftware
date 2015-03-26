@@ -41,12 +41,12 @@ classdef KF < handle
             obj.K = K;
             obj.x = obj.x + K*(fw.h(obj.x)-z);
             obj.t_assim = obj.t_assim + 1;
-            fw.xt = obj.x;
+            %fw.xt = obj.x;
         end
         function predict(obj,fw)
             % Propagate state x and its covariance P
             if obj.t_forecast == fw.step
-                fw.xt = obj.x;
+               % fw.xt = obj.x;
                 obj.x = fw.f(obj.x); % note that it changes fw
                 obj.P = fw.F*obj.P*fw.F';
             else
