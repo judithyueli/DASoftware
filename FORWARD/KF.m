@@ -39,7 +39,7 @@ classdef KF < handle
             % Update posterior covariance using Ricatti equation
             obj.P = obj.P - K*PHT';
             obj.K = K;
-            obj.x = obj.x + K*(fw.h(obj.x)-z);
+            obj.x = obj.x + K*(z-fw.h(obj.x));
             obj.t_assim = obj.t_assim + 1;
             %fw.xt = obj.x;
         end

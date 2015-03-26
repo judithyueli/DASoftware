@@ -32,8 +32,9 @@ classdef Saetrom < handle
             % Get geometry
             getLOC(obj);
             % Initialize state
-            rng(100)
-            obj.xt = obj.getx(obj.loc,param.kernel);
+            
+            %rng(100)
+            %obj.xt = obj.getx(obj.loc,param.kernel);
         end
         
         function y = h(obj,x)
