@@ -26,6 +26,8 @@ classdef KF < handle
             obj.Q = zeros(fw.m,fw.m);
             obj.R = param.obsstd.*eye(fw.n,fw.n);
             obj.nt = param.nt;
+            obj.m = fw.m;
+            obj.n = fw.n;
             % check
             % is case1.H, case1.h, case1.F, case1.f existed?
         end

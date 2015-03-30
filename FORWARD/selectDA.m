@@ -8,6 +8,8 @@ function da = selectDA(param,fw)
 switch param.method
     case 'KF'
         da = KF(param,fw);
+    case 'CSKF'
+        da = CSKF(param,fw);
     otherwise %add your own method class
         error('method does not exit');
 end
