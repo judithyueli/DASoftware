@@ -1,0 +1,11 @@
+method          KF
+model           Saetrom
+n               100
+p               10
+m               13
+nstep           10
+assim_step      13
+state_std       20
+obs_std         1
+cov_function    exponential
+cor_length       6
