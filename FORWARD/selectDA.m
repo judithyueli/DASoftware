@@ -10,6 +10,8 @@ switch param.method
         da = KF(param,fw);
     case 'CSKF'
         da = CSKF(param,fw);
+    %case 'SpecKF'
+    %    da = SpecKF(param,fw);
     otherwise %add your own method class
         error('method does not exit');
 end
