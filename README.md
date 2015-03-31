@@ -6,7 +6,9 @@ This is a Matlab library of data assimilation methods developed to solve large-s
 ## Start with examples
 
 We have provided the users linear and nonlinear state estimation problems to get familier with data assimilation methods provided in the library.  
-
+```
+[sol,true]=main('prm-saetrom.txt')
+```
 ### Example 1: Saetrom
 
 ### Example 2: LA
@@ -25,23 +27,38 @@ Here we show a diagram of the methods provided in the library.
 |  SpecKF  | approximate uncertainty/fixed H| p forward run|  O(m) operations|
 
 ## Add your own example
+1. Change selectFW.m
+2. Add your own class: LA.m  (see template given by Saetrom.m)
+3. Reuse the properties and methods as many as possible and make sure use the same variable name in class, param structure and text file
+4. Do not commit changes before you test your code on your local branch
 
 ## Add your own method
 1. Change selectDA.m
-2. Add your own function: SpecKF.m following the template given by CSKF.m
+2. Add your own class: SpecKF.m (see template given by CSKF.m)
 3. Add additional parameters specific to SpecKF in get_prmstruct.m
 4. Make sure use the same variable name in class, param and text file
+5. Do not commit changes before you test your code on your local branch
+
+## How to collaborate using Github (desktop version)
+1. create your own branch: HojatBranch (or other name you want to give to your local branch, note that it is different from creating a new repository)
+- To create a new branch off of the master branch, click the + button on the left side of the branch name. Type a name for your new branch into the text field that appears, and click Branch to create it.
+2. click "publish" so it shows up in github website
+3. make sure HojatBranch is the current branch before you commit changes-> i.e., you commit to your local branch instead of the master branch
+4. send a pull request: [link](https://help.github.com/articles/using-pull-requests/)
+- an email will be sent to all 3 of us (all contributors)
+5. together we can review the request and decide whether to merge or not
 
 #### Reference:
 1. Judith Yue Li, Sivaram Ambikasaran, Eric F. Darve, Peter K. Kitanidis, A Kalman filter powered by H2-matrices for quasi-continuous data assimilation problems [link](https://www.dropbox.com/s/xxjdvixq7py4bhp/HiKF.pdf)
 
 2. Sivaram Ambikasaran, Judith Yue Li, Peter K. Kitanidis, Eric Darve, Large-scale stochastic linear inversion using hierarchical matrices, Computational Geosciences, December 2013, Volume 17, Issue 6, pp 913-927 [link](http://link.springer.com/article/10.1007%2Fs10596-013-9364-0)
 
-3. Hojat
+3. Ghorbanidehno, H., A. Kokkinaki, J. Y. Li, E. Darve, and P. K. Kitanidis, 2014. Real time data
+assimilation for large-scale systems with the Spectral Kalman Filter: An application in CO2
+storage monitoring, Submitted to Advances in Water Resources, Special issue on data
+assimilation (under review)
 
-4.
-
-5. 
+4. Judith Yue Li, A. Kokkinaki, H. Ghorbanidehno, E. Darve, and P. K. Kitanidis, 2015. The nonlinear compressed state Kalman filter for efficient large-scale reservoir monitoring, Submitted to Water Resources Research (under review)
 
 <script type="text/javascript"
    src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
