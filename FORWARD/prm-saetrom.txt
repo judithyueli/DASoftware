@@ -1,9 +1,6 @@
 method          KF
 model           Saetrom
 m               100
-multi           1
-N               20
-BasisType       SVD
 n               13
 nt              10
 x_std           20
