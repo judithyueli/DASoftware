@@ -1,6 +1,6 @@
 classdef FW <handle
-    % Forward model superclass
-    % Methods and functions shared in the FW subclass
+    % Abstract interface for all forward model subclass
+    % list all properties and methods shared in the FW subclass (concrete)
     properties
         model = '';
         m = [];
@@ -10,16 +10,8 @@ classdef FW <handle
         x = [];
         loc = [];
     end
-    
-    methods
-        function obj = FW(param)
-            % obj is an instance of FW class
-            obj.model = param.model;
-            switch obj.model
-                case Saetrom
-                    obj = Saetrom(); % illegal
-                otherwise %add your own class
-            end
-        end
+    methods (Abstract)
+        y = h(obj,x); % measurement function
+        x = f(obj,x); % forward model
     end
 end
