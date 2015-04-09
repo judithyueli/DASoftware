@@ -58,9 +58,10 @@ for i = 1:param.nt
 end
 
 %% plot final state
+% PLOT NEEDS TO BECOME EITHER A FUNCTION OR A CLASS
 subplot(2,1,2)
 plotstate(da,fw)
-title('CSKF mean and STD at step 10');
+title([param.method,' mean and STD at step 10']);
 
 
 end
