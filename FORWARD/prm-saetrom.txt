@@ -5,6 +5,8 @@ multi           1
 N               20
 BasisType       SVD
 n               13
+m               100
+n               13
 nt              10
 x_std           20
 obsstd          1

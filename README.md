@@ -3,6 +3,24 @@
 
 This is a Matlab library of data assimilation methods developed to solve large-scale state-parameter estimation problems. Data assimilation approach has been widely used in geophysics, hydrology and numerical weather forecast to improve the forecast from a numerical model based on data sets collected in real time. Conventional approach like Kalman filter is computatioanlly prohibitive for large problems. The DASoftware(Rename) library takes advantage of advances in computatioanl science and consists of new data assimilation approach that is scalable for large-scale problems. The functions and examples are produced based on collabrated work on data assimialtion documented in the papers listed in the Reference section.
 
+## Task list
+- User interface
+	- [x] Add text file input 
+- Method
+	- [x] Add CSKF method
+	- [] Add EnKF method
+	- [] Add SpecKF method
+	- [] Add Abstract Class for method
+- Example
+	- [x] Add Saetrom example
+	- [] Add LA example (linear, 1D, with parameter)
+	- [] Add Abstract Class for examples
+	- [] Add Tomography example
+- Functionality
+	- [] Add plot tools
+	- [] Add Class for compressing a kernel matrix, generate realizations from a kernel matrix and...
+	- [] Add inferential statistics like CR, Q2, normalized residual
+
 ## Start with examples
 
 We have provided the users linear and nonlinear state estimation problems to get familier with data assimilation methods provided in the library.  
@@ -25,6 +43,8 @@ Here we show a diagram of the methods provided in the library.
 |          | random-walk forward model    | |  |
 |  CSKF    |    smooth problem            | r forward run | O(m) operations|
 |  SpecKF  | approximate uncertainty/fixed H| p forward run|  O(m) operations|
+|  EnKF    | monte carlo based approach   | r forward 
+run | O(m) operations|
 
 ## Add your own example
 1. Change selectFW.m
