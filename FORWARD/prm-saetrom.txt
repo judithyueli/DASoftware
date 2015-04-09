@@ -1,7 +1,7 @@
 method          KF
 model           Saetrom
-n               100
-m               13
+m               100
+n               13
 nt              10
 assim_step      13
 x_std           20
