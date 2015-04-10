@@ -13,7 +13,7 @@ function [fSol,tSol,ierror,stats] = main(INFILE)
 % Input variables are read from file INFILE
 % See documentation for details on input data
 
-% Usage
+% Example usage
 
 % [fSol,tSol,errorid,stats]=main(INFILE);
 
