@@ -1,64 +1,85 @@
 # Github notes
 ============
-This note features Github commands required to solve problems like:
+This note features git commands required for *version control*.  
 
-## To start
-### How can I *clone* a copy of DASoftware from remote server to my local directory?
-- Go to local directory
-- `git clone <remote url>`
+### Establish local repository: local __master__ and branch __current__
+- *clone* a copy of DASoftware from remote server to my local directory?
+	- Go to local directory
+	- `git clone <remote url>`
 Now you should have a *local master* branch
 
-### How can I create a *branch* of DASoftware? This is useful for a team project, as the changes to the master need to be reviewed by all of the team members before *merge* happens.
-- `git branch <branch name>
+- Create a *branch* from *master* for a specific purpose. This is useful for a team project, as the changes to the master need to be reviewed by all of the team members before *merge* happens.
+	- `git branch <branch name>`
 
-### How can I *commit* or take a snapshot of my files so that I can track the changes?
-- swith to the branch you want to sync with the master. That is, your HEAD is pointing to the branch now.
+### Make and track changes locally at your working branch
+- How can I *commit* or take a snapshot of my files so that I can track the changes?
+	- 1.Swith to the branch you want to sync with the master. That is, your HEAD is pointing to the branch now.
 
-`git checkout <branch name>
+	`git checkout <branch name>`
 
-- Stage all changes you want to sync to master (or be added to your local history). If you only want to commit a change in a specific file, then don't stage the file yet.
+	- 2.Stage all changes you want to sync to master (or be added to your local history). If you only want to commit a change in a specific file, then don't stage the file yet.
 
-`git add <file name>`
+		`git add <file name>`
 
-if you want to include removal as a change use
+	- 3.If you want to include removal as a change use
 
-`git add --all`	
+		`git add --all`	
 
-- Show staged files, unstaged files, untracked files. You can also find out which branch you are on and whether your branch is behind the *remote master*.
+	- 4.Show staged files, unstaged files, untracked files. You can also find out which branch you are on and whether your branch is behind the *remote master*.
 
-` git status `
+		` git status `
 
--　Commit changes or take a snapshot. 
+	- 5.Commit changes or take a snapshot. 
 
-`git commit -m'message'`
+		`git commit -m'message'`
 
-## Track changes locally
-### If I have a *local master* (suppose it is up to dated with your *remote master*) and a *local branch*, how can I sync with *local master* from my *local branch*?? (Assume that you don't have any uncommitted changes or unstaged changes)
+	- 6.Check commit history
 
-- Always switch to the branch and check the status (git will reset your working directory to be the same as the last commit of this branch)
+		`git log`
 
-`git checkout <branch name>`
-`git status`
+### Is your local __master__ is up to date?
+- __Use with caution!!__If your local __master__ is not up to date with the remote __master__, then *pull* changes from *remote* to *local* master branch. But this will possibly overwrite your local changes in your __master__ branch. 
+	` git status `
 
-- If your status shows *fast-forward*, that means you are ahead of *master*
+	` git pull <remote> --merge `
 
-- merge *current* into *master* 3-way merge current, master and common ancestor
-` git checkout master`
-` git merge current `
+### Sync changes locally between __master__ and __current__
 
-- occasionally you want to merge *master* to your *current* to get updated changes
+![A graphic presentation of the merge](http://git-scm.com/book/en/v2/book/03-git-branching/images/basic-merging-1.png)
 
-`git checkout current'
-`git merge master`
+At this point your *local master* (synced from *remote master*) are at __C4__, while your *local branch* __iss53__ is at __C5__ (you created the branch from __C2__ , and then master is updated from __C2__ to __C4__)
 
-## Sync changes from local to remote
-## *pull* changes from *remote* to *local* master branch
+- How can I merge changes in *local branch* __iss53__ to my *local master branch*?? (Assume that you don't have any uncommitted changes or unstaged changes)
 
-` git pull <remote> --merge `
+	- 1.Always switch to the branch and check the status (git will reset your working directory to be the same as the last commit of this branch)
 
-## *push* changes from *local* to *remote master*
+		`git checkout <branch name>`
+		`git status`
 
-` git push --merge `
+	- 2.If your status shows *fast-forward*, that means you are ahead of *master*, go to step 3.
+
+	- 3.Merge *current* into *master* 3-way merge current, master and common ancestor
+		` git checkout master`
+
+		` git merge <branch name> `
+
+	- 4.Do not merge *master* to your *current* to get updated changes from master. If you have to do it, be very __!!cautious!!__ as this may overwrite some of the unstaged changes or untracked files.
+
+		`git checkout <branch name>`
+		
+		`git merge master`
+
+	- 5.If local __master__ and __current__ branch are synced, then you can delete the the __current_branch
+
+		`git branch -d current`
+
+### Sync changes from local to remote
+- Have you tested the __master__ locally using testing examples? If you are modifying a method class, make sure it runs for all examples. Else if you are modifying a forward model class, make sure it runs for all method. __TODO__
+
+- *push* changes from *local* to *remote master*
+
+	` git push --merge `
+
 #### Reference:
 1. git-scm.com [link](http://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging)
 
