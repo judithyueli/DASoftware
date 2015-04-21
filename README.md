@@ -5,21 +5,31 @@ This is a Matlab library of data assimilation methods developed to solve large-s
 
 ## Task list
 - User interface
-	- [x] Add text file input 
+	- Add text file input [x]
+	- A github note [x] 
 - Method
-	- [x] Add CSKF method
-	- [] Add EnKF method
-	- [] Add SpecKF method
-	- [] Add Abstract Class for method
+	- Add KF method [x]
+	- __Add CSKF method__
+		- change getFU and getHU by using getJv (4/21)
+	- __Add EnKF method__
+	- __Add SpecKF method__
+		- Test SpecKF using linear Saetrom example (4/21)
+		- Add `Jv = getJv(f,v)`, a general routine to compute the product of Jacobian of function f(x) with vector v
+		- Change PFH and PH
+	- Add Abstract Class DA for method [x]
 - Example
-	- [x] Add Saetrom example
-	- [] Add LA example (linear, 1D, with parameter)
-	- [] Add Abstract Class for examples
-	- [] Add Tomography example
+	- Add Saetrom example []
+		- Linear f(x) [x]
+		- Nonlinear f(x) []
+	- __Add Saetrom nonlinear example__
+	- Add LA example (linear, 1D, with parameter)
+	- Add Abstract Class for examples
+	- Add Tomography example
 - Functionality
-	- [] Add plot tools
-	- [] Add Class for compressing a kernel matrix, generate realizations from a kernel matrix and...
-	- [] Add inferential statistics like CR, Q2, normalized residual
+	- Add plot tools []
+		- Add a routine for initial and final step [x]
+	- Add Class for compressing a kernel matrix, generate realizations from a kernel matrix and...
+	- Add inferential statistics like CR, Q2, normalized residual
 
 ## Start with examples
 

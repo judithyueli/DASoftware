@@ -1,15 +1,18 @@
 # Github notes
 ============
-This note features git commands required for *version control*.  
+This note features git commands required for *version control*. 
 
-### Establish local repository: local __master__ and branch __current__
+### Establish local repository: local __master__ and working branch __iss53__
 - *clone* a copy of DASoftware from remote server to my local directory?
 	- Go to local directory
 	- `git clone <remote url>`
 Now you should have a *local master* branch
 
 - Create a *branch* from *master* for a specific purpose. This is useful for a team project, as the changes to the master need to be reviewed by all of the team members before *merge* happens.
+
 	- `git branch <branch name>`
+
+Now you have 3 branches: origin/master, master and iss53(your working branch)
 
 ### Make and track changes locally at your working branch
 - How can I *commit* or take a snapshot of my files so that I can track the changes?
@@ -43,7 +46,7 @@ Now you should have a *local master* branch
 
 	` git pull <remote> --merge `
 
-### Sync changes locally between __master__ and __current__
+### Sync changes locally between __master__ and your working branch
 
 ![A graphic presentation of the merge](http://git-scm.com/book/en/v2/book/03-git-branching/images/basic-merging-1.png)
 
@@ -66,7 +69,7 @@ At this point your *local master* (synced from *remote master*) are at __C4__, w
 	- 4.Do not merge *master* to your *current* to get updated changes from master. If you have to do it, be very __!!cautious!!__ as this may overwrite some of the unstaged changes or untracked files.
 
 		`git checkout <branch name>`
-		
+
 		`git merge master`
 
 	- 5.If local __master__ and __current__ branch are synced, then you can delete the the __current_branch
