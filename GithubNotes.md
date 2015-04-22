@@ -76,22 +76,27 @@ At this point your *local master* (synced from *remote master*) are at __C4__, w
 		
 - Option 2 - rebasing
 	- Rebasing vs merging: rebasing will create a linear history for the remote master making it is easier to tracks changes. In terms of the status of your branches and local, the end result is exactly the same
-	- 1.Always switch to the branch and check the status (git will reset your working directory to be the same as the last commit of this branch)
+	- 1. Always switch to the branch and check the status (git will reset your working directory to be the same as the last commit of this branch)
 
 		`git checkout <branch name>`
 		`git status`
 		
-	- 2. If your status shows *fast-forward*, that means that your local branch has no new committed changes and therefore the *master* is ahead of you, so you need to move the pointer of your branch to where the master is.
+	- 2a. If your status shows *fast-forward*, that means that your local branch has no new committed changes and therefore the *master* is ahead of you, so you need to move the pointer of your branch to where the master is.
 		`git merge master`
 	Now the master and your branch are at the same point.
 	
-	- 3. If you status does not show *fast-forward*, that means that your local branch has new committed changes and you need to update the master with your branch.
+	- 2b. If you status does not show *fast-forward*, that means that your local branch has new committed changes and you need to update the master with your branch.
+	
 		`git checkout <branch>`
 		`git rebase master`
-	- 4. Now remote master has your changes. Next, move pointer of local master to where the remote master is
+
+
+	- 3. Now the remote master has your changes. Next, move pointer of local master to where the remote master is
+	
 		`git checkout <master>`
 		`git merge <branch>`
-	Note: when you git merge from x point, the pointer of x moves to what you merged with
+
+	(Note: when you git merge from x point, the pointer of x moves to what you merged with)
 
 
 
