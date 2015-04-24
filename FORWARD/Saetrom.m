@@ -3,7 +3,7 @@ classdef Saetrom < handle
     % Modified on 24/03/2015 by Judith Li
     properties
         xt = [];    % true state
-        step = [];  % current step
+        step = [];  % current step, must be within range [1,10].Note matlab index from 1 instead of 0 as in C++
         zt = [];    % true observation
     end
     
@@ -41,6 +41,8 @@ classdef Saetrom < handle
             % obj and x must reflect the correct initial condition before calling this function
             Hmtx = obj.H; % H is initialized in constructor for static case, for dynamic case use getH
             y = Hmtx*x;
+            noise = obj.zt_std*randn(size(obj.zt));
+            obj.zt = obj.zt + noise;
         end
         
         function x = f(obj,x)

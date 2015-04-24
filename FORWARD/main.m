@@ -14,15 +14,14 @@ function [da,fw]=main(filename)
 % param.nt = 10; % total data assimilation step
 param=get_prm(filename);
 param.kernel = @(h) param.x_std.*exp(-(h./(20/3)));
-
 % TODO: add other parameters specifed by users:
 % total simulation step
 
 %% Initialization
 % Map simulation parameters to FW subclass and create an object at time 0
 fw = selectFW(param);
-file = load('ini.mat');
-fw.xt = file.xt;
+% file = load('ini.mat');
+% fw.xt = file.xt;
 % Map inversion parameters to DA subclass and create an object at time 0
 da = selectDA(param,fw);
 
@@ -42,8 +41,6 @@ for i = 1:param.nt
     fw.step = i; % mandatory for Saetrom case
     fw.xt = fw.f(fw.xt);
     fw.zt = fw.h(fw.xt);
-    noise = fw.zt_std*randn(size(fw.zt));
-    fw.zt = fw.zt + noise;
     
     %% Run data assimilation to get solution x and its uncertainty, save as property of da
     % KF forecast
