@@ -27,6 +27,8 @@ classdef CSKF <handle
             obj.N = param.N;
             obj.BasisType = param.BasisType;
             obj.kernel = param.kernel;
+            % initialize state using fw.getx
+            rng(101);
             obj.x = fw.getx(fw.loc,obj.kernel); % TODO: hard coding
             obj.A = getBasis(obj,fw);
             obj.C = getCompCov(obj,fw);
@@ -41,15 +43,10 @@ classdef CSKF <handle
         
         function predict(obj,fw)
             % Propagate state x and its covariance P
-            if obj.t_forecast == fw.step
-                % fw.xt = obj.x;
                 obj.x = fw.f(obj.x);    % note that it changes fw
                 obj.FA = getFA(obj,fw);
                 U = obj.A'* obj.FA;
                 obj.C = U*obj.C*U' + obj.V;
-            else
-                error('forward model clock is not syned with data assimilation clock');
-            end
             obj.t_forecast = obj.t_forecast + 1;
             obj.P = obj.A*obj.C*obj.A'; % for test
         end
@@ -62,7 +59,7 @@ classdef CSKF <handle
             BB = obj.HA*obj.C;
             XX = AA\BB;
             obj.K = obj.A*XX';
-            obj.x = obj.x + obj.K*(z-fw.h(obj.x));
+            obj.x.vec = obj.x.vec + obj.K*(z-fw.h(obj.x));
             obj.C = (eye(size(obj.C))-XX'*obj.HA)*obj.C;%Nmn+ N^2 + N^3
             obj.t_assim = obj.t_assim + 1;
             obj.P = obj.A*obj.C*obj.A'; % for test

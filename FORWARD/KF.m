@@ -21,6 +21,7 @@ classdef KF < handle
             % method specific initialization
             % cases1 is an instance of the MODEL class (Saetrom, etc..)
             obj.kernel = param.kernel;
+            rng(101);
             obj.x = fw.getx(fw.loc,obj.kernel); % TODO: hard coding
             obj.P = fw.getQ(fw.loc,obj.kernel);
             obj.Q = zeros(fw.m,fw.m);
@@ -41,41 +42,36 @@ classdef KF < handle
             % Update posterior covariance using Ricatti equation
             obj.P = obj.P - K*PHT';
             obj.K = K;
-            obj.x = obj.x + K*(z-fw.h(obj.x));
+            obj.x.vec = obj.x.vec + K*(z-fw.h(obj.x));
             obj.t_assim = obj.t_assim + 1;
             %fw.xt = obj.x;
         end
         function predict(obj,fw)
             % Propagate state x and its covariance P
-            if obj.t_forecast == fw.step
-               % fw.xt = obj.x;
-                obj.x = fw.f(obj.x); % note that it changes fw
-                obj.P = fw.F*obj.P*fw.F';
-            else
-                error('forward model clock is not syned with data assimilation clock');
-            end
+            obj.x = fw.f(obj.x); % note that it changes fw
+            obj.P = fw.F*obj.P*fw.F';
             obj.t_forecast = obj.t_forecast + 1;
         end
     end
     
-%     methods(Access = private,Static)
-%         function Q0 = getQ(loc,kernelfun)
-%             % Each column of loc saves the coordinates of each point
-%             % For 2D cases, loc = [x y]
-%             % For 3D cases, loc = [x y z]
-%             % np: number of points
-%             % nd: number of dimension
-%             [np,nd] = size(loc);
-%             h = zeros(np,np); % seperation between two points
-%             for i = 1:nd
-%                 xi = loc(:,i);
-%                 [xj,xl]=meshgrid(xi(:),xi(:));
-%                 h = h + ((xj-xl)).^2;
-%             end
-%             h = sqrt(h);
-%             Q0 = kernelfun(h);
-%         end
-%     end
+    %     methods(Access = private,Static)
+    %         function Q0 = getQ(loc,kernelfun)
+    %             % Each column of loc saves the coordinates of each point
+    %             % For 2D cases, loc = [x y]
+    %             % For 3D cases, loc = [x y z]
+    %             % np: number of points
+    %             % nd: number of dimension
+    %             [np,nd] = size(loc);
+    %             h = zeros(np,np); % seperation between two points
+    %             for i = 1:nd
+    %                 xi = loc(:,i);
+    %                 [xj,xl]=meshgrid(xi(:),xi(:));
+    %                 h = h + ((xj-xl)).^2;
+    %             end
+    %             h = sqrt(h);
+    %             Q0 = kernelfun(h);
+    %         end
+    %     end
     
     % TODO: define a destructor
 end

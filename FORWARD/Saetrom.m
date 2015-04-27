@@ -2,13 +2,14 @@ classdef Saetrom < handle
     % Created on 14/03/2015 by Judith Li
     % Modified on 24/03/2015 by Judith Li
     properties
-        xt = [];    % true state
-        step = [];  % current step, must be within range [1,10].Note matlab index from 1 instead of 0 as in C++
-        zt = [];    % true observation
+        xt = [];    % true state, a structure (xt.vec, xt.t), 
+                    % xt.t must be within range [1,10].
+                    % Because matlab index from 1 instead of 0 as in C++
+        zt = [];    % true observation with noise added
     end
     
     properties(GetAccess = public,SetAccess = private)
-        nstep = []; % maximum step
+        tspan = []; % maximum step
         m = [];     % number of unknowns
         n = [];     % number of observation
         H = [];     % measurement equation, fixed in time
@@ -23,15 +24,14 @@ classdef Saetrom < handle
         function obj = Saetrom(param)
             % Check input
             % Initialize parameters by case1 = Saetrom(param);
-            obj.m = 100; %param.m;
-            obj.n = 13; %param.n;
-            obj.step = 0;% begin from time 0
-            obj.nstep = 10;
+            obj.m = param.m;
+            obj.n = param.n;
+            obj.tspan = 9;
             % Construct H that is fixed in time
             obj.H = getH(obj);
             % Get geometry
             getLOC(obj);
-            % Initialize state
+            % Initialize state structure
             rng(100)
             obj.xt = obj.getx(obj.loc,param.kernel);
         end
@@ -40,7 +40,7 @@ classdef Saetrom < handle
             %% Observation equation
             % obj and x must reflect the correct initial condition before calling this function
             Hmtx = obj.H; % H is initialized in constructor for static case, for dynamic case use getH
-            y = Hmtx*x;
+            y = Hmtx*x.vec;
             noise = obj.zt_std*randn(size(obj.zt));
             obj.zt = obj.zt + noise;
         end
@@ -51,22 +51,25 @@ classdef Saetrom < handle
             % obj is the initil condition that is not corrected by DA
             % obj.step and x must reflect the correct initial condition before calling this function
             % overload property: obj.F changes at the end of call
-            if (size(x,1) ~= obj.m) || (size(x,2) ~= 1)
+            if (size(x.vec,1) ~= obj.m) || (size(x.vec,2) ~= 1)
                 error('x is not the right size');
             else
-                Fmtx = getF(obj);
-                x = Fmtx*x;
+                Fmtx = obj.getF(x.t);
+                % update state x and transition matrix F
+                x.vec = Fmtx*x.vec;
+                x.t = x.t + 1;
                 obj.F = Fmtx;
-                % update xt,F and step??
             end
         end
         
         function x = getx(obj,loc,kernelfun)
+            % called in constructor of FW and DA
             % generate a random realization from N(0,Q0), where Q0 is
             % generated form kernelfun and loc. See getQ for details
             Q0 = obj.getQ(loc,kernelfun);
             [A,C,~] = svd(Q0);
-            x = zeros(obj.m,1) + A*sqrt(C)*randn(obj.m,1);
+            x.vec = zeros(obj.m,1) + A*sqrt(C)*randn(obj.m,1);
+            x.t = 0;
         end
         
         function delete(obj)
@@ -95,12 +98,12 @@ classdef Saetrom < handle
     end
     
     methods(Access = private)
-        function F = getF(obj)
-            % Get transition matrix F, a function of step k
+        function F = getF(obj,t)
+            % Get transition matrix F, a function of t (0,9)
             % F is constructed to move 0<x<55 but 56<x<100 remains static
             F = eye(obj.m, obj.m);
-            if (obj.step>=1) && (obj.step<=obj.nstep)
-                k = obj.step;
+            if (t >= 0) && (t <= obj.tspan) % check time index
+                k = t + 1;
             else
                 error('k must be an iteger from 1 to 10');
             end

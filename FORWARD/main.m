@@ -38,7 +38,6 @@ title('Initial condition at step 0');
 for i = 1:param.nt
     %% Run truemodel to produce true state xt and data z, save as property of fw
     % call f and h to update state and observation
-    fw.step = i; % mandatory for Saetrom case
     fw.xt = fw.f(fw.xt);
     fw.zt = fw.h(fw.xt);
     
