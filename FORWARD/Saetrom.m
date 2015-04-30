@@ -66,7 +66,7 @@ classdef Saetrom < handle
             % called in constructor of FW and DA
             % generate a random realization from N(0,Q0), where Q0 is
             % generated form kernelfun and loc. See getQ for details
-            Q0 = obj.getQ(loc,kernelfun);
+            Q0 = common.getQ(loc,kernelfun);
             [A,C,~] = svd(Q0);
             x.vec = zeros(obj.m,1) + A*sqrt(C)*randn(obj.m,1);
             x.t = 0;
@@ -77,26 +77,7 @@ classdef Saetrom < handle
             disp('The object from Saetrom is going to be deleted');
         end
     end
-    
-    methods(Static)
-        function Q0 = getQ(loc,kernelfun)
-            % Each column of loc saves the coordinates of each point
-            % For 2D cases, loc = [x y]
-            % For 3D cases, loc = [x y z]
-            % np: number of points
-            % nd: number of dimension
-            [np,nd] = size(loc);
-            h = zeros(np,np); % seperation between two points
-            for i = 1:nd
-                xi = loc(:,i);
-                [xj,xl]=meshgrid(xi(:),xi(:));
-                h = h + ((xj-xl)).^2;
-            end
-            h = sqrt(h);
-            Q0 = kernelfun(h);
-        end
-    end
-    
+        
     methods(Access = private)
         function F = getF(obj,t)
             % Get transition matrix F, a function of t (0,9)

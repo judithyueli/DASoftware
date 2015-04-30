@@ -74,7 +74,7 @@ classdef CSKF <handle
         end
         
         function A = getBasis(obj,fw)
-            P0 = fw.getQ(fw.loc,obj.kernel);
+            P0 = common.getQ(fw.loc,obj.kernel);
             switch obj.BasisType
                 case 'DCT'
                     error('to be added');
@@ -90,7 +90,7 @@ classdef CSKF <handle
         
         function C = getCompCov(obj,fw)
             % hard code, use mxBBFMM2D instead
-            P0 = fw.getQ(fw.loc,obj.kernel);
+            P0 = common.getQ(fw.loc,obj.kernel);
             C = obj.A'* P0 * obj.A;
         end
         

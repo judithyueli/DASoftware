@@ -23,7 +23,7 @@ classdef KF < handle
             obj.kernel = param.kernel;
             rng(101);
             obj.x = fw.getx(fw.loc,obj.kernel); % TODO: hard coding
-            obj.P = fw.getQ(fw.loc,obj.kernel);
+            obj.P = common.getQ(fw.loc,obj.kernel);
             obj.Q = zeros(fw.m,fw.m);
             obj.R = param.obsstd.*eye(fw.n,fw.n);
             obj.nt = param.nt;
