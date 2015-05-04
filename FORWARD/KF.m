@@ -1,20 +1,12 @@
-classdef KF < handle
+classdef KF < DA
     % Created on 18/03/2015 by Judith Li
     % Modified on 24/03/2015 by Judith Li
     properties
-        n; % number of measurements
-        m; % number of unknowns
-        x; % state estimated by KF
         P; % state error covariance
         Q; % model error covariance
         R; % measurement error covariance
         H; % measurement operator
         F; % transition matrix
-        K; % Kalman gain
-        nt; % total assimilation step
-        kernel; % kernel used for initialization
-        t_assim = 0; % assimilation step count
-        t_forecast = 0;% forecast step count
     end
     methods
         function obj = KF(param,fw)
@@ -32,17 +24,16 @@ classdef KF < handle
             % check
             % is case1.H, case1.h, case1.F, case1.f existed?
         end
-        function update(obj,fw,z)
+        function update(obj,fw)
             % Update state x and covariance P by assimilating data z
             % form cross covariance
             obj.H = fw.H;
             PHT = obj.P*fw.H';
             % Calculate Kalman Gain
-            K = PHT/(fw.H*PHT+obj.R);
+            obj.K = PHT/(fw.H*PHT+obj.R);
             % Update posterior covariance using Ricatti equation
-            obj.P = obj.P - K*PHT';
-            obj.K = K;
-            obj.x.vec = obj.x.vec + K*(z-fw.h(obj.x));
+            obj.P = obj.P - obj.K*PHT';
+            obj.x.vec = obj.x.vec + obj.K*(fw.zt-fw.h(obj.x));
             obj.t_assim = obj.t_assim + 1;
             %fw.xt = obj.x;
         end

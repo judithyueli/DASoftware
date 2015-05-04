@@ -48,7 +48,7 @@ for i = 1:param.nt
     
     % KF predict
     da.t_assim = i;
-    da.update(fw,fw.zt);
+    da.update(fw);
     
     % save fw and da as snapshots for analysis
 end

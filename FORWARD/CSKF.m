@@ -1,16 +1,7 @@
-classdef CSKF <handle
+classdef CSKF < DA
     % Created by Judith Li 3/27
     % Modified by Judith Li 3/30
     properties
-        n; % number of measurements
-        m; % number of unknowns
-        x; % state estimated by CSKF
-        nt; % total assimilation step
-        K; % Kalman gain
-        kernel; % kernel used for initialization
-        t_assim = 0; % assimilation step count
-        t_forecast = 0;% forecast step count
-        %%%%
         N; % number of basis
         A; % orthorgonal basis selected using DCT or rSVD
         C; % compressed covariance of P
@@ -51,7 +42,7 @@ classdef CSKF <handle
             obj.P = obj.A*obj.C*obj.A'; % for test
         end
         
-        function update(obj,fw,z)
+        function update(obj,fw)
             % update x using measurement z
             obj.HA = getHA(obj,fw);
             HPHT = obj.HA*obj.C*obj.HA';%nN^2 + n^2N
@@ -59,7 +50,7 @@ classdef CSKF <handle
             BB = obj.HA*obj.C;
             XX = AA\BB;
             obj.K = obj.A*XX';
-            obj.x.vec = obj.x.vec + obj.K*(z-fw.h(obj.x));
+            obj.x.vec = obj.x.vec + obj.K*(fw.zt-fw.h(obj.x));
             obj.C = (eye(size(obj.C))-XX'*obj.HA)*obj.C;%Nmn+ N^2 + N^3
             obj.t_assim = obj.t_assim + 1;
             obj.P = obj.A*obj.C*obj.A'; % for test

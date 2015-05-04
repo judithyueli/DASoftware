@@ -14,8 +14,8 @@ classdef Saetrom < handle
         n = [];     % number of observation
         H = [];     % measurement equation, fixed in time
         F = [];     % state transition equation, change with time
-        xt_std = 20; % true state STD
-        zt_std = 1; % true observation STD
+        xt_var = 20; % true state variance
+        zt_var = 1; % true observation variance
         loc = [];   % m x nd matrix, location coordinates of each state variable
     end
     
@@ -41,7 +41,7 @@ classdef Saetrom < handle
             % obj and x must reflect the correct initial condition before calling this function
             Hmtx = obj.H; % H is initialized in constructor for static case, for dynamic case use getH
             y = Hmtx*x.vec;
-            noise = obj.zt_std*randn(size(obj.zt));
+            noise = sqrt(obj.zt_var)*randn(size(obj.zt));
             obj.zt = obj.zt + noise;
         end
         

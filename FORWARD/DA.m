@@ -4,6 +4,7 @@ classdef DA <handle
     properties
         n; % number of measurements
         m; % number of unknowns
+        loc; % location of the particles
         kernel; % kernel, a function handle
         x; % state mean
         nt; % total assimilation step
@@ -13,7 +14,7 @@ classdef DA <handle
     end    
     methods (Abstract)
         predict(obj,fw);
-        update(obj,fw,z);
+        update(obj,fw);
     end
     
 end
