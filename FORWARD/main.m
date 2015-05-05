@@ -5,15 +5,17 @@ function [da,fw]=main(filename)
 % function [sol,stats] = main(filename)
 % input: filename of input selected by users
 
-% Convert information from txt into a structure param
-% param = readINFILE(filename);
-% param.model = 'Saetrom';
-% param.method = 'KF';
-% param.x_std = 20;
-% param.obsstd = 1; % observation STD
-% param.nt = 10; % total data assimilation step
-param=get_prm(filename);
-param.kernel = @(h) param.x_std.*exp(-(h./(20/3)));
+% check input type
+if isa(filename,'char')
+    % Convert information from txt into a structure param
+    param=get_prm(filename);
+elseif isa(filename,'struct')
+    param = filename;
+else
+    error('input must be a filename or a structure');
+end
+    
+param.kernel = @(h) param.x_std.*exp(-(h./(20/3))); % x_std is the variance
 % TODO: add other parameters specifed by users:
 % total simulation step
 
@@ -43,11 +45,11 @@ for i = 1:param.nt
     
     %% Run data assimilation to get solution x and its uncertainty, save as property of da
     % KF forecast
-    da.t_forecast = i;
+%     da.t_forecast = i;
     da.predict(fw);
     
     % KF predict
-    da.t_assim = i;
+%     da.t_assim = i;
     da.update(fw);
     
     % save fw and da as snapshots for analysis

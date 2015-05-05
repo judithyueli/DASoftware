@@ -21,6 +21,8 @@ classdef KF < DA
             obj.nt = param.nt;
             obj.m = fw.m;
             obj.n = fw.n;
+            obj.t_assim = 0;
+            obj.t_forecast = 0;
             % check
             % is case1.H, case1.h, case1.F, case1.f existed?
         end
