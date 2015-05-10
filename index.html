@@ -31,20 +31,14 @@
 
 <p>We have provided the users linear and nonlinear state estimation problems to get familier with data assimilation methods provided in the library.  </p>
 
-<pre><code>[sol,true]=main('prm-saetrom.txt')
-</code></pre>
-
 <h3>
 <a id="example-1-saetrom" class="anchor" href="#example-1-saetrom" aria-hidden="true"><span class="octicon octicon-link"></span></a>Example 1: Saetrom</h3>
 
-<h3>
-<a id="example-2-la" class="anchor" href="#example-2-la" aria-hidden="true"><span class="octicon octicon-link"></span></a>Example 2: LA</h3>
-
-<h3>
-<a id="example-3-tomography" class="anchor" href="#example-3-tomography" aria-hidden="true"><span class="octicon octicon-link"></span></a>Example 3: Tomography</h3>
+<pre><code>[sol,true]=main('prm-saetrom.txt')
+</code></pre>
 
 <h2>
-<a id="how-to-select-methods" class="anchor" href="#how-to-select-methods" aria-hidden="true"><span class="octicon octicon-link"></span></a>How to select methods</h2>
+<a id="select-different-methods" class="anchor" href="#select-different-methods" aria-hidden="true"><span class="octicon octicon-link"></span></a>Select different methods</h2>
 
 <p>Here we show a diagram of the methods provided in the library.</p>
 
@@ -90,27 +84,6 @@
 </tr>
 </tbody>
 </table>
-
-<h2>
-<a id="add-your-own-example" class="anchor" href="#add-your-own-example" aria-hidden="true"><span class="octicon octicon-link"></span></a>Add your own example</h2>
-
-<ol>
-<li>Change selectFW.m</li>
-<li>Add your own class: LA.m  (see template given by Saetrom.m)</li>
-<li>Reuse the properties and methods as many as possible and make sure use the same variable name in class, param structure and text file</li>
-<li>Do not commit changes before you test your code on your local branch</li>
-</ol>
-
-<h2>
-<a id="add-your-own-method" class="anchor" href="#add-your-own-method" aria-hidden="true"><span class="octicon octicon-link"></span></a>Add your own method</h2>
-
-<ol>
-<li>Change selectDA.m</li>
-<li>Add your own class: SpecKF.m (see template given by CSKF.m)</li>
-<li>Add additional parameters specific to SpecKF in get_prmstruct.m</li>
-<li>Make sure use the same variable name in class, param and text file</li>
-<li>Do not commit changes before you test your code on your local branch</li>
-</ol>
 
 <h4>
 <a id="reference" class="anchor" href="#reference" aria-hidden="true"><span class="octicon octicon-link"></span></a>Reference:</h4>
