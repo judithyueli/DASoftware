@@ -1,0 +1,10 @@
+model           TargetTracking
+rate            3
+rate_std        1e-4
+dt              1
+method          EKF/CSKF
+EKFtype         EKF/sEKF/iEKF
+CSKFtype        CSKF/sCSKF
+nSteps        	100
+seed            200
+theta           [2 0.3]

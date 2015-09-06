@@ -1,0 +1,14 @@
+model           linearSSM
+F               5
+H               10
+Q               1
+R               1
+P               1
+x               0.2
+z               0.5
+method          KF/EKF/CSKF/EnKF
+EKFtype         EKF/sEKF/iEKF
+CSKFtype        CSKF/sCSKF
+nSteps          1
+seed            200
+theta           [2 0.3]

@@ -1,0 +1,14 @@
+model           Frio
+resolution      low/medium/high
+kernel          Exponential
+exp_power       0.5
+corrlength      900
+method          KF/HiKF/EnKF/CSKF
+sampling        soes/nrank/full	
+localization	no/bootstrap/covtaper
+CSKFtype        CSKF/sCSKF
+nRank           300
+nBootSamples    100
+nSteps          41
+seed            200
+theta           [0.0114e-2 1e-5]
