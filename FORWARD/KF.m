@@ -7,6 +7,7 @@ classdef KF < DA
         R; % measurement error covariance
         H; % measurement operator
         F; % transition matrix
+        variance; 
     end
     methods
         function obj = KF(param,fw)
@@ -16,6 +17,7 @@ classdef KF < DA
             rng(101);
             obj.x = fw.getx(fw.loc,obj.kernel); % TODO: hard coding
             obj.P = common.getQ(fw.loc,obj.kernel);
+            obj.variance = diag(obj.P);
             obj.Q = zeros(fw.m,fw.m);
             obj.R = param.obsstd.*eye(fw.n,fw.n);
             obj.nt = param.nt;
@@ -23,19 +25,28 @@ classdef KF < DA
             obj.n = fw.n;
             obj.t_assim = 0;
             obj.t_forecast = 0;
+            obj.H = fw.H;
             % check
             % is case1.H, case1.h, case1.F, case1.f existed?
         end
         function update(obj,fw)
             % Update state x and covariance P by assimilating data z
             % form cross covariance
-            obj.H = fw.H;
-            PHT = obj.P*fw.H';
+            P = obj.P;
+            H = obj.H;
+            R = obj.R;
+            PHT = P*H';
+            x = obj.x;
+            z = fw.zt;
+            h = @fw.h;
             % Calculate Kalman Gain
-            obj.K = PHT/(fw.H*PHT+obj.R);
+            K = PHT/(H*PHT+R);
             % Update posterior covariance using Ricatti equation
-            obj.P = obj.P - obj.K*PHT';
-            obj.x.vec = obj.x.vec + obj.K*(fw.zt-fw.h(obj.x));
+            P = P - K*PHT';
+            obj.x.vec = obj.x.vec + K*(z-h(x));
+            obj.P = P;
+            obj.variance = diag(P);
+            obj.K = K;
             obj.t_assim = obj.t_assim + 1;
             %fw.xt = obj.x;
         end
@@ -43,28 +54,9 @@ classdef KF < DA
             % Propagate state x and its covariance P
             obj.x = fw.f(obj.x); % note that it changes fw
             obj.P = fw.F*obj.P*fw.F';
+            obj.variance = diag(obj.P);
             obj.t_forecast = obj.t_forecast + 1;
         end
     end
     
-    %     methods(Access = private,Static)
-    %         function Q0 = getQ(loc,kernelfun)
-    %             % Each column of loc saves the coordinates of each point
-    %             % For 2D cases, loc = [x y]
-    %             % For 3D cases, loc = [x y z]
-    %             % np: number of points
-    %             % nd: number of dimension
-    %             [np,nd] = size(loc);
-    %             h = zeros(np,np); % seperation between two points
-    %             for i = 1:nd
-    %                 xi = loc(:,i);
-    %                 [xj,xl]=meshgrid(xi(:),xi(:));
-    %                 h = h + ((xj-xl)).^2;
-    %             end
-    %             h = sqrt(h);
-    %             Q0 = kernelfun(h);
-    %         end
-    %     end
-    
-    % TODO: define a destructor
 end

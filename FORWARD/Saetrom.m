@@ -36,9 +36,25 @@ classdef Saetrom < handle
             obj.xt = obj.getx(obj.loc,param.kernel);
         end
         
+        function [x,z] = simulate(obj,x)
+            % 1-step simulation
+            % for generating true process
+            % compute true state x
+            Fmtx = obj.getF(x.t);
+            x.vec = Fmtx*x.vec;
+            x.t = x.t + 1;
+            % compute true observation z
+            Hmtx = obj.H;
+            z = Hmtx*x.vec; % todo: add noise
+            obj.F = Fmtx;
+            obj.xt = x;
+            obj.zt = z;
+        end
+        
         function y = h(obj,x)
             %% Observation equation
-            % obj and x must reflect the correct initial condition before calling this function
+            % for filtering
+            % obj and x must reflect the correct static and dynamic initial condition before calling this function
             Hmtx = obj.H; % H is initialized in constructor for static case, for dynamic case use getH
             y = Hmtx*x.vec;
             noise = sqrt(obj.zt_var)*randn(size(obj.zt));
@@ -47,18 +63,17 @@ classdef Saetrom < handle
         
         function x = f(obj,x)
             %% Forecast equation
+            % used in filtering
             % x is the transformed unknowns used for data assimilation
-            % obj is the initil condition that is not corrected by DA
-            % obj.step and x must reflect the correct initial condition before calling this function
+            % obj and x is the static and dynamic initial condition that is not corrected by DA
             % overload property: obj.F changes at the end of call
             if (size(x.vec,1) ~= obj.m) || (size(x.vec,2) ~= 1)
                 error('x is not the right size');
             else
-                Fmtx = obj.getF(x.t);
                 % update state x and transition matrix F
+                Fmtx = obj.getF(x.t);
                 x.vec = Fmtx*x.vec;
                 x.t = x.t + 1;
-                obj.F = Fmtx;
             end
         end
         
