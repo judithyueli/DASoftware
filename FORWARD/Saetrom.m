@@ -2,9 +2,9 @@ classdef Saetrom < handle
     % Created on 14/03/2015 by Judith Li
     % Modified on 24/03/2015 by Judith Li
     properties
-        xt = [];    % true state, a structure (xt.vec, xt.t), 
-                    % xt.t must be within range [1,10].
-                    % Because matlab index from 1 instead of 0 as in C++
+        xt = [];    % true state, a structure (xt.vec, xt.t),
+        % xt.t must be within range [1,10].
+        % Because matlab index from 1 instead of 0 as in C++
         zt = [];    % true observation with noise added
     end
     
@@ -17,6 +17,7 @@ classdef Saetrom < handle
         xt_var = 20; % true state variance
         zt_var = 1; % true observation variance
         loc = [];   % m x nd matrix, location coordinates of each state variable
+        method = ''; % algorithm name
     end
     
     methods
@@ -29,6 +30,7 @@ classdef Saetrom < handle
             obj.tspan = 9;
             % Construct H that is fixed in time
             obj.H = getH(obj);
+            obj.method = param.method;
             % Get geometry
             getLOC(obj);
             % Initialize state structure
@@ -36,18 +38,18 @@ classdef Saetrom < handle
             obj.xt = obj.getx(obj.loc,param.kernel);
         end
         
-        function [x,z] = simulate(obj,x)
+        function [xnew,z] = simulate(obj,x)
             % 1-step simulation
             % for generating true process
             % compute true state x
             Fmtx = obj.getF(x.t);
-            x.vec = Fmtx*x.vec;
-            x.t = x.t + 1;
+            xnew.vec = Fmtx*x.vec;
+            xnew.t = x.t + 1;
             % compute true observation z
             Hmtx = obj.H;
             z = Hmtx*x.vec; % todo: add noise
             obj.F = Fmtx;
-            obj.xt = x;
+            obj.xt = xnew;
             obj.zt = z;
         end
         
@@ -87,12 +89,49 @@ classdef Saetrom < handle
             x.t = 0;
         end
         
+        function visualize(obj,fw_list,da_list)
+            % Plot initial condition
+            figure;
+            subplot(2,1,1)
+            obj.plotstate(da_list{1},fw_list{1})
+            title('Initial condition at step 0');
+            
+            %% plot final state
+            % PLOT NEEDS TO BECOME EITHER A FUNCTION OR A CLASS
+            subplot(2,1,2)
+            obj.plotstate(da_list{end},fw_list{end})
+            title([obj.method,' mean and STD at step 10']);
+            
+        end
+        
+        function plotstate(obj,da,fw)
+            % plot the true and estimated state
+            % input:
+            % da: data asismialtion data
+            % fw: true data
+            if isfield(da,'P')
+                pvar = diag(da.P);
+            elseif isfield(da,'variance')
+                pvar = da.variance;
+            else
+                pvar = zeros(size(fw.xt.vec));
+            end
+            plot(   1:obj.m,fw.xt.vec,'r',...
+                1:obj.m,da.x.vec,'b',...
+                1:obj.m,da.x.vec + 1.96*sqrt(pvar),'g',...
+                1:obj.m,da.x.vec - 1.96*sqrt(pvar),'g')
+            hold on;
+            xi = [5 15 25 35 40 45 50 55 60 65 75 85 95];
+            plot(xi,fw.xt.vec(xi),'*')
+            legend('True','Estimated','95% interval');
+        end
+        
         function delete(obj)
             % destructor: do we need it?
             disp('The object from Saetrom is going to be deleted');
         end
     end
-        
+    
     methods(Access = private)
         function F = getF(obj,t)
             % Get transition matrix F, a function of t (0,9)

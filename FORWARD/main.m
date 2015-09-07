@@ -30,8 +30,15 @@ da = selectDA(param,fw);
 % TODO: check if fw and da contain all the necessary properties and functions after initialization
 rng(100);
 
+% note that da and fw are objects of a handle class, cannot make a copy
+% therefore, save a copy by converting the properties to structure,this
+% will however display all private field, and issue warning, to suppress
+% the warning, use
+warning('off','MATLAB:structOnObject');
 da_list = cell(param.nt+1,1);
 fw_list = cell(param.nt+1,1);
+da_list{1} = struct(da);
+fw_list{1} = struct(fw);
 
 % major assimilation loop
 for i = 1:param.nt
@@ -44,10 +51,12 @@ for i = 1:param.nt
     da.predict(fw);
     da.update(fw);
     
-    da_list{i}  = da;
-    fw_list{i}  = fw;
+    da_list{i+1}  = struct(da);
+    fw_list{i+1}  = struct(fw);
     % save fw and da as snapshots for analysis
     
 end
+
+fw.visualize(fw_list,da_list)
 
 end
