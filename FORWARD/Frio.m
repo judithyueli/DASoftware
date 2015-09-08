@@ -5,36 +5,42 @@ classdef Frio < handle
     Observations are 288 travel-time delay (ms) at 41 time steps.    
 %}
     properties
-        nt;
+        nt;         % number of assimilation step
         x_true_list % a cell of x vector for each time step
         y_true_mtx  % a matrix containing true observation
         step;       % max = 41
         m;         % scalar, state dimension
         n;         % scalar, observation dimension
-        F;
-        H;
-        QHT;
+        F;          % transition matrix
+        H;          % measurement matrix
+        QHT;        % model error cross-covariance 
         resolution; % low/medium/large
         x_loc;
         y_loc;
-        grid;       % m x dim matrix, grid block coordinates
+        loc;       % m x dim matrix, grid block coordinates
         xt;         % structure
                     % xt.vec: m x 1 vector, current state
                     % xt.t: scalar, current time
         zt;         % n x 1 vector, current observation
         nt_max = 41;% maximum step
+        output_slice; % output time steps
     end
     methods
         function obj = Frio(param)
             % read data files
+            obj.n = 288;
+            obj.nt = param.nt;
             obj.resolution = param.resolution;
             switch obj.resolution
                 case 'low'
                     file = load('./data/Res1.mat');
+                    obj.m = 59*55;
                 case 'medium'
                     file = load('./data/Res2.mat');
+                    obj.m = 117*109;
                 case 'high'
                     file = load('./data/Res3.mat');
+                    obj.m = 234*217;
             end
            
             % load simulation results
@@ -48,19 +54,22 @@ classdef Frio < handle
             x_loc = file.xc;
             y_loc = file.yc;
             [X,Y] = meshgrid(x_loc,y_loc);
-            obj.grid = [X(:) Y(:)];
+            obj.loc = [X(:) Y(:)];
             obj.x_loc = x_loc;
             obj.y_loc = y_loc;
             
             % load sensor measurement operator and measurements
             obj.H = file.H;
             obj.F = eye(obj.m,obj.m);
-            [obj.n, obj.m] = size(obj.H);
             obj.QHT = file.M1;
             obj.y_true_mtx = file.data65;
             
             % initialize state
             obj.xt = obj.getx();
+
+            % plot info
+            obj.output_slice = param.output_slice;
+            assert(max(obj.output_slice)<=obj.nt);
         end
 
         function [x,z] = simulate(obj,x)
@@ -81,15 +90,9 @@ classdef Frio < handle
         end
 
         function x = f(obj,x)
-            % forecast state
-                try
-                    x.t = x.t+1;
-                    x.vec = obj.x_true_list{x.t+1};
-                catch err
-                    fprintf('index for x_true_list %d exceeds the maximum %d\n',x.t+1,obj.nt_max)
-                    rethrow(err);
-                end
-   
+            % forecast state using random walk model
+            x.t = x.t+1;
+            x.vec = x.vec;
         end
 
         function y = h(obj,x)
@@ -124,10 +127,11 @@ classdef Frio < handle
             xwell = obj.x_loc(crosswell);
             ywell = obj.y_loc;
             
-            for k = 1:3
-                figure;
-                i = 1;
-                for j = [11 21 31 40]%linspace(2,nt,4)
+            figure;
+            i = 1;
+            for k = 1:4
+                nsubfigure = length(obj.output_slice);
+                for j = obj.output_slice %linspace(2,nt,4)
                     switch k
                         case 1 % true mean
                             clims = [-1.27 6.3]*1e-1;
@@ -144,7 +148,7 @@ classdef Frio < handle
                         otherwise
                             error('error');
                     end
-                    subplot (2,2,i)
+                    subplot (4,nsubfigure,i)
                     %     imagesc(xwell,ywell,xtruewell{j},clims)
                     x_image = reshape(x_image,ny,nx);
                     x_image = x_image(:,crosswell);
@@ -152,7 +156,7 @@ classdef Frio < handle
                     % imagesc(xwell,ywell,xestwell{j})
             %             imagesc(xwell,ywell,pstvar{j})
                     %imagesc(xc,yc,truemodel{j},clims)
-                    title ([num2str(j*3),' hours after injection'])
+                    title ([num2str(j*3),' hours'])
                     axis image
                     colorbar
                     % title 'true model'

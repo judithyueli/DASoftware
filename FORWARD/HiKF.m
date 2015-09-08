@@ -28,7 +28,7 @@ classdef HiKF < DA
             obj.nt = param.nt;
             obj.m = fw.m;
             obj.n = fw.n;
-            obj.loc = fw.grid;
+            obj.loc = fw.loc;
             obj.theta = param.theta;
             rng(param.seed);
 

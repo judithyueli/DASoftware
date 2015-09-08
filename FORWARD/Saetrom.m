@@ -18,6 +18,7 @@ classdef Saetrom < handle
         zt_var = 1; % true observation variance
         loc = [];   % m x nd matrix, location coordinates of each state variable
         method = ''; % algorithm name
+        kernel;     % for initial covariance
     end
     
     methods
@@ -31,11 +32,13 @@ classdef Saetrom < handle
             % Construct H that is fixed in time
             obj.H = getH(obj);
             obj.method = param.method;
+            obj.kernel = param.kernel;
+
             % Get geometry
             getLOC(obj);
             % Initialize state structure
             rng(100)
-            obj.xt = obj.getx(obj.loc,param.kernel);
+            obj.xt = obj.getx();
         end
         
         function [xnew,z] = simulate(obj,x)
@@ -79,11 +82,11 @@ classdef Saetrom < handle
             end
         end
         
-        function x = getx(obj,loc,kernelfun)
-            % called in constructor of FW and DA
+        function x = getx(obj)
+            % called in constructor of FW and DA for initialization
             % generate a random realization from N(0,Q0), where Q0 is
             % generated form kernelfun and loc. See getQ for details
-            Q0 = common.getQ(loc,kernelfun);
+            Q0 = common.getQ(obj.loc,obj.kernel);
             [A,C,~] = svd(Q0);
             x.vec = zeros(obj.m,1) + A*sqrt(C)*randn(obj.m,1);
             x.t = 0;
