@@ -45,4 +45,18 @@ end
 if isprop(kf,'QHT')
 	kf.QHT = zeros(obj.m,obj.n);
 end
+
+% CSKF
+if isprop(kf,'A')
+	kf.A = kf.getBasis(obj.loc,obj.kernel);
+end
+
+if isprop(kf,'C')
+	kf.C = kf.getCompCov(obj.loc,obj.kernel,kf.A);
+end
+
+if isprop(kf,'V')
+	kf.V = zeros(size(kf.C));
+end
+
 end

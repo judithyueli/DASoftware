@@ -50,4 +50,17 @@ if isprop(kf,'QHT')
 	kf.QHT = common.getKernelMatrixProd(obj.kernel,obj.loc,obj.H');
 end
 
+% CSKF
+if isprop(kf,'A')
+	kf.A = kf.getBasis(obj.loc,obj.kernel);
+end
+
+if isprop(kf,'C')
+	kf.C = zeros(kf.N,kf.N);
+end
+
+if isprop(kf,'V')
+	kf.V = kf.getCompCov(obj.loc,obj.kernel,kf.A);
+end
+
 end
