@@ -8,7 +8,7 @@ classdef KF < DA
         H; % measurement operator
         F; % transition matrix
         variance;
-        theta;  % hyperparameter controlling data fitting 
+        theta;  % hyperparameter controlling data fitting
     end
     methods
         function obj = KF(param,fw)
@@ -16,7 +16,7 @@ classdef KF < DA
             % cases1 is an instance of the MODEL class (Saetrom, etc..)
             obj.kernel = param.kernel;
             rng(101);
-            obj.x = fw.getx(); 
+            obj.x = fw.getx();
             obj.P = common.getQ(fw.loc,obj.kernel);
             obj.variance = diag(obj.P);
             obj.Q = zeros(fw.m,fw.m);
@@ -27,12 +27,6 @@ classdef KF < DA
             obj.t_assim = 0;
             obj.t_forecast = 0;
             obj.H = fw.H;
-            if isfield(param,'theta')
-                obj.theta = param.theta;
-                obj.P = obj.theta(1)*obj.theta(2)*obj.P;
-                obj.Q = obj.theta(1)*obj.theta(2)*obj.Q;
-                obj.R = obj.theta(2)*obj.R;
-            end
             % check
             % is case1.H, case1.h, case1.F, case1.f existed?
         end
@@ -59,10 +53,20 @@ classdef KF < DA
         end
         function predict(obj,fw)
             % Propagate state x and its covariance P
-            obj.x = fw.f(obj.x); % note that it changes fw
-            obj.P = fw.F*obj.P*fw.F';
+            obj.x = fw.f(obj.x); % note that it changes fw.F and fw.x
+            obj.P = fw.F*obj.P*fw.F'+ obj.Q;
             obj.variance = diag(obj.P);
             obj.t_forecast = obj.t_forecast + 1;
+        end
+        
+        function obj = addRegularization(obj,param)
+            if isfield(param,'theta')
+                obj.theta = param.theta;
+                obj.P = obj.theta(1)*obj.theta(2)*obj.P;
+                obj.Q = obj.theta(1)*obj.theta(2)*obj.Q;
+                obj.R = obj.theta(2)*obj.R;
+                obj.variance = diag(obj.P);
+            end
         end
     end
     

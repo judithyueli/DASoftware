@@ -14,6 +14,8 @@ switch param.method
         da = SpecKF(param,fw);
     case 'EnKF'
         da = EnKF(param,fw);
+    case 'HiKF'
+        da = HiKF(param,fw);
     otherwise %add your own method class
         error('method does not exit');
 end

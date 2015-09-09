@@ -29,17 +29,16 @@ classdef HiKF < DA
             obj.m = fw.m;
             obj.n = fw.n;
             obj.loc = fw.loc;
-            obj.theta = param.theta;
             rng(param.seed);
 
             % Initializing state space models
             obj.x = fw.getx(); %hard code for Frio case
             obj.H = fw.H;
-            obj.PHT = obj.theta(1)*obj.theta(2)*zeros(obj.m,obj.n);
+            obj.PHT = zeros(obj.m,obj.n);
             obj.variance = zeros(obj.m,1);
-            obj.variance_Q = obj.theta(1)*obj.theta(2)*ones(obj.m,1);
-            obj.QHT = obj.theta(1)*obj.theta(2)*common.getKernelMatrixProd(obj.kernel,obj.loc,obj.H');
-            obj.R = obj.theta(2)*eye(obj.n,obj.n);
+            obj.variance_Q = ones(obj.m,1);
+            obj.QHT = common.getKernelMatrixProd(obj.kernel,obj.loc,obj.H');
+            obj.R = eye(obj.n,obj.n);
             obj.t_assim = 0;
             obj.t_forecast = 0;
             % check

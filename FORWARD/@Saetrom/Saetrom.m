@@ -15,7 +15,7 @@ classdef Saetrom < handle
         H = [];     % measurement equation, fixed in time
         F = [];     % state transition equation, change with time
         xt_var = 20; % true state variance
-        zt_var = 1; % true observation variance
+        obsvar = 1; % true observation variance
         loc = [];   % m x nd matrix, location coordinates of each state variable
         method = ''; % algorithm name
         kernel;     % for initial covariance
@@ -28,6 +28,8 @@ classdef Saetrom < handle
             % Initialize parameters by case1 = Saetrom(param);
             obj.m = param.m;
             obj.n = param.n;
+            obj.xt_var = param.x_std;
+            obj.obsvar = param.obsstd;
             obj.tspan = 9;
             % Construct H that is fixed in time
             obj.H = getH(obj);
@@ -50,7 +52,8 @@ classdef Saetrom < handle
             xnew.t = x.t + 1;
             % compute true observation z
             Hmtx = obj.H;
-            z = Hmtx*x.vec; % todo: add noise
+            noise = sqrt(obj.obsvar)*randn(size(obj.n,1));
+            z = Hmtx*x.vec + noise; % todo: add noise
             obj.F = Fmtx;
             obj.xt = xnew;
             obj.zt = z;
@@ -62,8 +65,6 @@ classdef Saetrom < handle
             % obj and x must reflect the correct static and dynamic initial condition before calling this function
             Hmtx = obj.H; % H is initialized in constructor for static case, for dynamic case use getH
             y = Hmtx*x.vec;
-            noise = sqrt(obj.zt_var)*randn(size(obj.zt));
-            obj.zt = obj.zt + noise;
         end
         
         function x = f(obj,x)
@@ -129,10 +130,6 @@ classdef Saetrom < handle
             legend('True','Estimated','95% interval');
         end
         
-        function delete(obj)
-            % destructor: do we need it?
-            disp('The object from Saetrom is going to be deleted');
-        end
     end
     
     methods(Access = private)
@@ -182,9 +179,11 @@ classdef Saetrom < handle
         
     end
     
-    %     methods(Static)
-    %     end
-    %
+    methods
+        da = initializeSSM(obj,da);
+        % initialize state space model(SSM) of Frio for a given filter
+        % type (KF,HiKF,CSKF)
+    end
 end
 
 %TODO: consider put these common functions (generate covariance or a realization

@@ -1,5 +1,5 @@
 function kf = initializeSSM(obj,kf)
-% initialize state space model(SSM) of Frio for given kf
+	% initialize state space model(SSM) of Saetrom for given kf
 % type (KF,HiKF,CSKF)
 
 % map model properties to filter
@@ -7,11 +7,11 @@ kf.m = obj.m;
 kf.n = obj.n;
 
 if isprop(kf,'P')
-	kf.P = zeros(kf.m,kf.m);
+	kf.P = common.getQ(obj.loc,obj.kernel);
 end
 
 if isprop(kf,'Q')
-	kf.Q = common.getQ(obj.loc,obj.kernel);
+	kf.Q = zeros(kf.m,kf.m);
 end
 
 if isprop(kf,'R')
@@ -27,11 +27,7 @@ if isprop(kf,'K')
 end
 
 if isprop(kf,'variance')
-	kf.variance = zeros(kf.m,1);% TODO: change to VarOfState
-end
-
-if isprop(kf,'F')
-	kf.F = eye(kf.m,kf.m);
+	kf.variance = obj.xt_var*ones(kf.m,1);% TODO: change to VarOfState
 end
 
 if isprop(kf,'x')
@@ -39,15 +35,14 @@ if isprop(kf,'x')
 end
 
 if isprop(kf,'PHT')
-	kf.PHT = zeros(obj.m,obj.n);
+	kf.PHT = common.getKernelMatrixProd(obj.kernel,obj.loc,obj.H');
 end
 
 if isprop(kf,'variance_Q')
-	kf.variance_Q = ones(obj.m,1);
+	kf.variance_Q = zeros(obj.m,1);
 end
 
 if isprop(kf,'QHT')
-	kf.QHT = common.getKernelMatrixProd(obj.kernel,obj.loc,obj.H');
+	kf.QHT = zeros(obj.m,obj.n);
 end
-
 end

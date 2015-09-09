@@ -7,6 +7,8 @@ function fw = selectFW(param)
 switch param.model
     case 'Saetrom'
         fw = Saetrom(param);
+    case 'Frio'
+        fw = Frio(param);
     %add your own class
     otherwise
         error('foward model does not exist');
