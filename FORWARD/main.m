@@ -27,6 +27,9 @@ fw = selectFW(param);
 % Map inversion parameters to DA subclass and create an object at time 0
 da = selectDA(param,fw);
 
+da = fw.initializeSSM(da);
+da = da.addRegularization(param);
+
 % TODO: check if fw and da contain all the necessary properties and functions after initialization
 rng(100);
 

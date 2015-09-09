@@ -87,6 +87,17 @@ classdef HiKF < DA
             obj.t_forecast = obj.t_forecast + 1;
         end
 
+        function obj = addRegularization(obj,param)
+            if isfield(param,'theta')
+                obj.theta = param.theta;
+                obj.PHT = obj.theta(1)*obj.theta(2)*obj.PHT;
+                obj.QHT = obj.theta(1)*obj.theta(2)*obj.QHT;
+                obj.R = obj.theta(2)*obj.R;
+                obj.variance = obj.theta(1)*obj.theta(2)*obj.variance;
+                obj.variance_Q = obj.theta(1)*obj.theta(2)*obj.variance_Q;
+            end
+        end
+
     end
     
 end
