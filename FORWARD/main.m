@@ -1,4 +1,4 @@
-function [da,fw]=main(filename)
+function [da,fw,da_list,fw_list]=main(filename)
 % Description:
 % function [sol,stats] = main(filename)
 % input: filename of input selected by users
