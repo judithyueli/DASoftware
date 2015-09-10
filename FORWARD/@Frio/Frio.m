@@ -1,9 +1,9 @@
 classdef Frio < handle
-%{
-    A 2D data assimilation example. Data sets cosist of true CO2 simulation results 
+    %{
+    A 2D data assimilation example. Data sets cosist of true CO2 simulation results
     at three different resolution (low,medium,high) that users can choose from.
-    Observations are 288 travel-time delay (ms) at 41 time steps.    
-%}
+    Observations are 288 travel-time delay (ms) at 41 time steps.
+    %}
     properties
         nt;         % number of assimilation step
         x_true_list % a cell of x vector for each time step
@@ -13,14 +13,14 @@ classdef Frio < handle
         n;         % scalar, observation dimension
         F;          % transition matrix
         H;          % measurement matrix
-        QHT;        % model error cross-covariance 
+        QHT;        % model error cross-covariance
         resolution; % low/medium/large
         x_loc;
         y_loc;
         loc;       % m x dim matrix, grid block coordinates
         xt;         % structure
-                    % xt.vec: m x 1 vector, current state
-                    % xt.t: scalar, current time
+        % xt.vec: m x 1 vector, current state
+        % xt.t: scalar, current time
         zt;         % n x 1 vector, current observation
         nt_max = 41;% maximum step
         output_slice; % output time steps
@@ -34,7 +34,7 @@ classdef Frio < handle
             obj.nt = param.nt;
             obj.resolution = param.resolution;
             obj.kernel = param.kernel;
-
+            
             switch obj.resolution
                 case 'low'
                     file = load('./data/Res1.mat');
@@ -46,7 +46,7 @@ classdef Frio < handle
                     file = load('./data/Res3.mat');
                     obj.m = 234*217;
             end
-           
+            
             % load simulation results
             obj.x_true_list = cell(obj.nt_max,1);
             for i = 1:obj.nt_max
@@ -71,7 +71,7 @@ classdef Frio < handle
             
             % initialize state
             obj.xt = obj.getx();
-
+            
             % plot info
             obj.output_slice = param.output_slice;
             assert(max(obj.output_slice)<=obj.nt);
@@ -93,18 +93,18 @@ classdef Frio < handle
                 rethrow(err);
             end
         end
-
+        
         function x = f(obj,x)
             % forecast state using random walk model
             x.t = x.t+1;
             x.vec = x.vec;
         end
-
+        
         function y = h(obj,x)
             % forecast observation
             y = obj.H*x.vec;
         end
-
+        
         function x = getx(obj)
             % initialize x at time 0
             x.t = 0;
@@ -157,9 +157,10 @@ classdef Frio < handle
                     %     imagesc(xwell,ywell,xtruewell{j},clims)
                     x_image = reshape(x_image,ny,nx);
                     x_image = x_image(:,crosswell);
-                    imagesc(xwell,ywell,x_image,clims)
+%                     imagesc(xwell,ywell,x_image,clims)
+                    imagesc(xwell,ywell,x_image)
                     % imagesc(xwell,ywell,xestwell{j})
-            %             imagesc(xwell,ywell,pstvar{j})
+                    %             imagesc(xwell,ywell,pstvar{j})
                     %imagesc(xc,yc,truemodel{j},clims)
                     title ([num2str(j*3),' hours'])
                     axis image
