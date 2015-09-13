@@ -37,32 +37,62 @@ classdef CSKF < DA
         
         function predict(obj,fw)
             % Propagate state x and its covariance P
-                obj.x = fw.f(obj.x);    % note that it changes fw
-                obj.FA = getFA(obj,fw);
+                fx = fw.f(obj.x);    % note that it changes fw
+                obj.FA = obj.getFA(@fw.f,obj.A,obj.x,fx);
                 U = obj.A'* obj.FA;
                 obj.C = U*obj.C*U' + obj.V;
             obj.t_forecast = obj.t_forecast + 1;
             obj.P = obj.A*obj.C*obj.A'; % for test
             obj.variance = diag(obj.P);
+            obj.x = fx;
         end
         
         function update(obj,fw)
             % update x using measurement z
-            obj.HA = getHA(obj,fw);
+            hx = fw.h(obj.x); %BUG: hx is not a structure?
+            obj.HA = obj.getFA(@fw.h,obj.A,obj.x,hx);
+%             obj.HA = getHA(obj,fw);
             HPHT = obj.HA*obj.C*obj.HA';%nN^2 + n^2N
             AA = HPHT + obj.R; % 2nN^2, innovation matrix
             BB = obj.HA*obj.C;
             XX = AA\BB;
             obj.K = obj.A*XX';
-            obj.x.vec = obj.x.vec + obj.K*(fw.zt-fw.h(obj.x));
+            obj.x.vec = obj.x.vec + obj.K*(fw.zt.vec-hx.vec);
             obj.C = (eye(size(obj.C))-XX'*obj.HA)*obj.C;%Nmn+ N^2 + N^3
             obj.t_assim = obj.t_assim + 1;
             obj.P = obj.A*obj.C*obj.A'; % for test
             obj.variance = diag(obj.P);
         end
         
-        function FA = getFA(obj,fw)
-            FA = fw.F*obj.A; % hard coding for Saetrom
+        function FA = getFA(obj,f,A,x,fx)
+            % compute Jacobian matrix product
+            % input:
+            %   f: function handle
+            %       it Jacobian F is size of n x m
+            %   A:  matrix of size m x N
+            %       matrix multiplier
+            %   x:  structure, contain .vec
+            %       input
+            %   fx: forecast of size n x 1
+%             FA = fw.F*obj.A; % hard coding for Saetrom
+            N = size(A,2);
+            n = size(fx.vec,1);
+            FA = zeros(n,N);
+            delta = 1e-8;
+            a = delta*norm(x.vec);
+            if a <=0
+                a = delta;
+                fprintf('FA: perturbation factor a is smaller than zero, change it to %d\n',delta);
+            end
+            for i = 1:N
+                u = A(:,i);
+                b = a/norm(u);
+                x1 = x;
+                x1.vec = x.vec + b*u;
+                fx1 = f(x1);
+                FA(:,i) = (fx1.vec-fx.vec)/b;
+            end
+            
         end
         
         function HA = getHA(obj,fw)

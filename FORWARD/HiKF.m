@@ -56,7 +56,7 @@ classdef HiKF < DA
 
             % innovation
             y = fw.h(x);
-            dy = z - y;
+            dy = z.vec - y.vec;
             HPHT = H*PHT;
             K = PHT/(HPHT + R);
             x.vec = x.vec + K*dy;

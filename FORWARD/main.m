@@ -23,17 +23,17 @@ end
 % Map simulation parameters to FW subclass and create an object at time 0
 fw = selectFW(param);
 
-% construct kernelfun for fw.kernel
-addpath('./mexBBFMM2D/')
-if isprop(fw,'kernel')
-    syms h;
-    kernel = sym(fw.kernel);
-    outputfile = 'expfun';
-    cd ./mexBBFMM2D/
-    make(h,kernel,outputfile);
-    copyfile('./expfun.mexmaci64','../+common/','f');
-    cd ../
-end
+% % construct kernelfun for fw.kernel
+% addpath('./mexBBFMM2D/')
+% if isprop(fw,'kernel')
+%     syms h;
+%     kernel = sym(fw.kernel);
+%     outputfile = 'expfun';
+%     cd ./mexBBFMM2D/
+%     make(h,kernel,outputfile);
+%     copyfile('./expfun.mexmaci64','../+common/','f');
+%     cd ../
+% end
 % Map inversion parameters to DA subclass and create an object at time 0
 da = selectDA(param,fw);
 

@@ -9,7 +9,8 @@ function PH = getKernelMatrixProd(kernelfun,loc,H)
 % P = common.getQ(loc,kernelfun);
 % PH = P*H;
 nCheb = 6;
+print = false;
 assert(size(loc,2)==2); % only for 2D
-PH = expfun(loc(:,1),loc(:,2),H,nCheb);
+PH = expfun(loc(:,1),loc(:,2),H,nCheb,print);
 end
 

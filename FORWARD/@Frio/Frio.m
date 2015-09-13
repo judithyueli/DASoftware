@@ -21,7 +21,8 @@ classdef Frio < handle
         xt;         % structure
         % xt.vec: m x 1 vector, current state
         % xt.t: scalar, current time
-        zt;         % n x 1 vector, current observation
+        zt;         % structure 
+        %zt.vec: n x 1 vector, current observation
         nt_max = 41;% maximum step
         output_slice; % output time steps
         obsvar;
@@ -85,7 +86,7 @@ classdef Frio < handle
             try
                 x.t = x.t+1;
                 x.vec = obj.x_true_list{x.t+1};
-                z = obj.y_true_mtx(:,x.t+1);
+                z.vec = obj.y_true_mtx(:,x.t+1);
                 obj.xt = x;
                 obj.zt = z;
             catch err
@@ -102,7 +103,7 @@ classdef Frio < handle
         
         function y = h(obj,x)
             % forecast observation
-            y = obj.H*x.vec;
+            y.vec = obj.H*x.vec;
         end
         
         function x = getx(obj)

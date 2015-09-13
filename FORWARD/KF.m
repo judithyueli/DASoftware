@@ -44,7 +44,8 @@ classdef KF < DA
             K = PHT/(H*PHT+R);
             % Update posterior covariance using Ricatti equation
             P = P - K*PHT';
-            obj.x.vec = obj.x.vec + K*(z-h(x));
+            y = h(x);
+            obj.x.vec = obj.x.vec + K*(z.vec-y.vec);
             obj.P = P;
             obj.variance = diag(P);
             obj.K = K;

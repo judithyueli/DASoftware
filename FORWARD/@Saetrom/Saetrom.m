@@ -53,7 +53,8 @@ classdef Saetrom < handle
             % compute true observation z
             Hmtx = obj.H;
             noise = sqrt(obj.obsvar)*randn(size(obj.n,1));
-            z = Hmtx*x.vec + noise; % todo: add noise
+            z.noisefree = Hmtx*x.vec;
+            z.vec = Hmtx*x.vec + noise; % todo: add noise
             obj.F = Fmtx;
             obj.xt = xnew;
             obj.zt = z;
@@ -64,7 +65,7 @@ classdef Saetrom < handle
             % for filtering
             % obj and x must reflect the correct static and dynamic initial condition before calling this function
             Hmtx = obj.H; % H is initialized in constructor for static case, for dynamic case use getH
-            y = Hmtx*x.vec;
+            y.vec = Hmtx*x.vec;
         end
         
         function x = f(obj,x)
