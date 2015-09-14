@@ -9,6 +9,8 @@ classdef KF < DA
         F; % transition matrix
         variance;
         theta;  % hyperparameter controlling data fitting
+        smoothing; % option to process data one step ahead
+        R1;
     end
     methods
         function obj = KF(param,fw)
@@ -16,17 +18,18 @@ classdef KF < DA
             % cases1 is an instance of the MODEL class (Saetrom, etc..)
 %             obj.kernel = param.kernel;
             rng(101);
-%             obj.x = fw.getx();
-%             obj.P = common.getQ(fw.loc,obj.kernel);
-%             obj.variance = diag(obj.P);
-%             obj.Q = zeros(fw.m,fw.m);
-%             obj.R = param.obsstd.*eye(fw.n,fw.n);
+            obj.x.vec = 0.5;
+            obj.P = 0.5;
+            obj.variance = diag(obj.P);
+            obj.Q = 0.1;
+            obj.R = 2;
             obj.nt = param.nt;
             obj.m = fw.m;
             obj.n = fw.n;
             obj.t_assim = 0;
             obj.t_forecast = 0;
-            obj.H = fw.H;
+            obj.H = 5;
+            obj.F = 1.2;
             % check
             % is case1.H, case1.h, case1.F, case1.f existed?
         end
@@ -54,11 +57,72 @@ classdef KF < DA
         function predict(obj,fw)
             % Propagate state x and its covariance P
             x = obj.x;
+            P = obj.P;
+            Q = obj.Q;
+            
             F = fw.getF(x);
-            obj.x = fw.f(x); % note that it changes fw.F and fw.x
-            obj.P = F*obj.P*F'+ obj.Q;
+            x = fw.f(x);
+            P = F*P*F' + Q;
+            
+            obj.x = x; % note that it changes fw.F and fw.x
+            obj.P = P;
             obj.variance = diag(obj.P);
             obj.t_forecast = obj.t_forecast + 1;
+        end
+        
+        function smooth(obj,fw)
+            x = obj.x;
+            R = obj.R;
+            Q = obj.Q;
+            z = fw.zt;
+            P = obj.P;
+            % get Jacobians
+            F   =     fw.getF(x);
+            xf  =     fw.f(x);
+            y   =     fw.h(xf);
+            H   =     fw.getH(xf);
+            H1 = H*F;
+            R1 = R+ H*Q*H';
+            % smoothing Gain
+            dy = z.vec - y.vec;
+            L = R1 + H1*P*H1';
+            K = P*H1'/L;
+            x.vec = x.vec + K*dy;
+            P = P - K*H1*P;
+            
+            obj.P = P;
+            obj.R1 = R1;
+            obj.x = x;
+            obj.K = K;
+        end
+        
+        function forecast(obj,fw)
+            x = obj.x;
+            Q = obj.Q;
+            P = obj.P;
+            R = obj.R;
+            z = fw.zt;
+            
+            F = fw.getF(x);
+            x = fw.f(x);
+            H = fw.getH(x);
+            R1 = R + H*Q*H';
+            y = fw.h(x);
+
+            %%%%%% scaling K %%%%%%
+            K1 = Q*H'/R1;
+        %     K1 = Q*H'*Rs'/(Rs*R1*Rs')*Rs;
+            %%%%%%%%%%%%%%%%%%%%%%%
+
+            F1 = (eye(size(F))-K1*H)*F;
+            Q1 = Q - K1*R1*K1';
+        %     x = F1*x + K1*y;
+            x.vec = x.vec + K1*(z.vec-y.vec);
+            P = F1*P*F1' + Q1;
+            
+            obj.P = P;
+            obj.x = x;
+            obj.K = K1;
         end
         
         function obj = addRegularization(obj,param)

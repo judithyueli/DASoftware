@@ -60,9 +60,13 @@ for i = 1:param.nt
     [fw.xt, fw.zt] = fw.simulate(fw.xt);
     
     %% Run data assimilation to get solution x and its uncertainty, save as property of da
-    % KF forecast
-    da.predict(fw);
-    da.update(fw);
+    if isfield(param,'smooth') && param.smooth == true
+        da.smooth(fw);
+        da.forecast(fw);
+    else
+        da.predict(fw);
+        da.update(fw);
+    end
     
     da_list{i+1}  = struct(da);
     fw_list{i+1}  = struct(fw);
