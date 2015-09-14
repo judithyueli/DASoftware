@@ -32,7 +32,7 @@ classdef Saetrom < handle
             obj.obsvar = param.obsstd;
             obj.tspan = 9;
             % Construct H that is fixed in time
-            obj.H = getH(obj);
+            obj.H = getH(obj,0);
             obj.method = param.method;
             obj.kernel = param.kernel;
 
@@ -47,7 +47,7 @@ classdef Saetrom < handle
             % 1-step simulation
             % for generating true process
             % compute true state x
-            Fmtx = obj.getF(x.t);
+            Fmtx = obj.getF(x);
             xnew.vec = Fmtx*x.vec;
             xnew.t = x.t + 1;
             % compute true observation z
@@ -78,7 +78,7 @@ classdef Saetrom < handle
                 error('x is not the right size');
             else
                 % update state x and transition matrix F
-                Fmtx = obj.getF(x.t);
+                Fmtx = obj.getF(x);
                 x.vec = Fmtx*x.vec;
                 x.t = x.t + 1;
             end
@@ -133,10 +133,11 @@ classdef Saetrom < handle
         
     end
     
-    methods(Access = private)
-        function F = getF(obj,t)
+    methods(Access = public)
+        function F = getF(obj,input)
             % Get transition matrix F, a function of t (0,9)
             % F is constructed to move 0<x<55 but 56<x<100 remains static
+            t = input.t;
             F = eye(obj.m, obj.m);
             if (t >= 0) && (t <= obj.tspan) % check time index
                 k = t + 1;
@@ -149,7 +150,7 @@ classdef Saetrom < handle
             F(5*(k-1)+1:5*(k+1),5*(k-1)+1:5*(k+1)) = Fin;
         end
         
-        function H = getH(obj)
+        function H = getH(obj,x)
             % Get measurement matrix H
             % H is fixed in time
             Hmtx = zeros(obj.n,obj.m);

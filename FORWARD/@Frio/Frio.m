@@ -112,6 +112,14 @@ classdef Frio < handle
             x.vec = obj.x_true_list{x.t+1};
         end
         
+        function H = getH(obj,x)
+            H = obj.H;
+        end
+        
+        function F = getF(obj,x)
+            F = obj.F;
+        end
+        
         function visualize(obj, fw_list, da_list)
             %% Plot results
             switch obj.resolution

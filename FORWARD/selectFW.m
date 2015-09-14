@@ -9,6 +9,8 @@ switch param.model
         fw = Saetrom(param);
     case 'Frio'
         fw = Frio(param);
+    case 'TargetTracking'
+        fw = TargetTracking(param);
     %add your own class
     otherwise
         error('foward model does not exist');

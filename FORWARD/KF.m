@@ -14,13 +14,13 @@ classdef KF < DA
         function obj = KF(param,fw)
             % method specific initialization
             % cases1 is an instance of the MODEL class (Saetrom, etc..)
-            obj.kernel = param.kernel;
+%             obj.kernel = param.kernel;
             rng(101);
-            obj.x = fw.getx();
-            obj.P = common.getQ(fw.loc,obj.kernel);
-            obj.variance = diag(obj.P);
-            obj.Q = zeros(fw.m,fw.m);
-            obj.R = param.obsstd.*eye(fw.n,fw.n);
+%             obj.x = fw.getx();
+%             obj.P = common.getQ(fw.loc,obj.kernel);
+%             obj.variance = diag(obj.P);
+%             obj.Q = zeros(fw.m,fw.m);
+%             obj.R = param.obsstd.*eye(fw.n,fw.n);
             obj.nt = param.nt;
             obj.m = fw.m;
             obj.n = fw.n;
@@ -34,17 +34,16 @@ classdef KF < DA
             % Update state x and covariance P by assimilating data z
             % form cross covariance
             P = obj.P;
-            H = obj.H;
             R = obj.R;
-            PHT = P*H';
             x = obj.x;
             z = fw.zt;
-            h = @fw.h;
+            H = fw.getH(obj.x);
+            y = fw.h(x);
             % Calculate Kalman Gain
+            PHT = P*H';
             K = PHT/(H*PHT+R);
             % Update posterior covariance using Ricatti equation
             P = P - K*PHT';
-            y = h(x);
             obj.x.vec = obj.x.vec + K*(z.vec-y.vec);
             obj.P = P;
             obj.variance = diag(P);
@@ -54,8 +53,10 @@ classdef KF < DA
         end
         function predict(obj,fw)
             % Propagate state x and its covariance P
-            obj.x = fw.f(obj.x); % note that it changes fw.F and fw.x
-            obj.P = fw.F*obj.P*fw.F'+ obj.Q;
+            x = obj.x;
+            F = fw.getF(x);
+            obj.x = fw.f(x); % note that it changes fw.F and fw.x
+            obj.P = F*obj.P*F'+ obj.Q;
             obj.variance = diag(obj.P);
             obj.t_forecast = obj.t_forecast + 1;
         end
