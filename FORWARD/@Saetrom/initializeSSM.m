@@ -1,5 +1,5 @@
 function kf = initializeSSM(obj,kf)
-	% initialize state space model(SSM) of Saetrom for given kf
+% initialize state space model(SSM) of Saetrom for given kf
 % type (KF,HiKF,CSKF)
 
 % map model properties to filter
@@ -31,6 +31,7 @@ if isprop(kf,'variance')
 end
 
 if isprop(kf,'x')
+    rng(obj.seed);
 	kf.x = obj.getx();
 end
 

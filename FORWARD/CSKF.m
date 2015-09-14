@@ -13,6 +13,7 @@ classdef CSKF < DA
         P; % full covariance (for testing purpose)
         theta; % hyperparameter controlling data fitting
         variance;
+        noQ;
         % TODO: extension for augmented state
     end
     methods
@@ -21,6 +22,9 @@ classdef CSKF < DA
             obj.BasisType = param.BasisType;
             obj.kernel = param.kernel;
             obj.nt = param.nt;
+            if isprop(param,'noQ')
+                obj.noQ = param.noQ;
+            end
             obj.m =  fw.m;
             obj.n =  fw.n;
             % initialize state using fw.getx
@@ -61,6 +65,85 @@ classdef CSKF < DA
             obj.C = (eye(size(obj.C))-XX'*obj.HA)*obj.C;%Nmn+ N^2 + N^3
             obj.t_assim = obj.t_assim + 1;
             obj.P = obj.A*obj.C*obj.A'; % for test
+            obj.variance = diag(obj.P);
+        end
+        
+        function smooth(obj,fw)
+            % smoothing step for sCSKF
+            x = obj.x;
+            A = obj.A;
+            z = fw.zt;
+            R = obj.R;
+            V = obj.V;
+            C = obj.C;
+            
+            % matrix-free Jacobian product
+            x0 = x;
+            h1 = @(x) fw.h(fw.f(x));
+            x = fw.f(x);
+            y = fw.h(x);
+            H1A = obj.getFA(h1,A,x0,y);
+            HA = obj.getFA(@fw.h,A,x,y);
+            % innovation and Kalman gain
+            eta = z.vec - y.vec;
+            if obj.noQ == true
+                R1 = R;
+            else
+                R1 = R + HA*V*HA';
+            end
+            LL = R1 + H1A*C*H1A';
+            RR  = H1A*C';
+            XX = LL'\RR;
+            K = A*XX';
+            % update state and cov
+            x0.vec = x0.vec + K*eta;
+            C = C - XX'*H1A*C;
+            obj.x = x0;
+            obj.C = C;
+            obj.P = obj.A*C*obj.A';
+            obj.variance = diag(obj.P);
+        end
+        
+        function forecast(obj,fw)
+            % forecast step for sCSKF
+            x = obj.x;
+            A = obj.A;
+            C = obj.C;
+            V = obj.V;
+            R = obj.R;
+            z = fw.zt;
+            
+            if obj.noQ == true
+                x0 = x;
+                x = fw.f(x);
+                y = fw.h(x);
+                FA = obj.getFA(@fw.f,A,x0,x);
+                AFA = A'*FA;
+                C = AFA*C*AFA' + V;
+            else
+                x0 = x;
+                h1 = @(x) fw.h(fw.f(x));
+                % get Jacobian product
+                x = fw.f(x);
+                y = fw.h(x);
+                FA = obj.getFA(@fw.f,A,x0,x);
+                HA = obj.getFA(@fw.h,A,x,y);
+                H1A = obj.getFA(h1,A,x0,y);
+
+                % innovation and Kalman gain
+                eta = z.vec - y.vec;
+                R1 = R + HA*V*HA';
+                K1 = A*V*HA'*inv(R1);
+
+                % update x and cov
+                x.vec = x.vec + K1*eta;
+                AK1 = A'*K1;
+                AF1A = A'*(FA - K1*H1A); 
+                C = AF1A*C*AF1A' + V - AK1*R1*AK1';
+            end
+            obj.x = x;
+            obj.C = C;
+            obj.P = obj.A*C*obj.A';
             obj.variance = diag(obj.P);
         end
         

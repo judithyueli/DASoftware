@@ -10,7 +10,7 @@ classdef KF < DA
         variance;
         theta;  % hyperparameter controlling data fitting
         smoothing; % option to process data one step ahead
-        R1;
+        noQ;
     end
     methods
         function obj = KF(param,fw)
@@ -30,7 +30,10 @@ classdef KF < DA
             obj.t_forecast = 0;
             obj.H = 5;
             obj.F = 1.2;
-            % check
+            if isprop(param,'noQ')
+                obj.noQ = param.noQ;
+            end
+                % check
             % is case1.H, case1.h, case1.F, case1.f existed?
         end
         function update(obj,fw)
@@ -82,8 +85,12 @@ classdef KF < DA
             y   =     fw.h(xf);
             H   =     fw.getH(xf);
             H1 = H*F;
-            R1 = R+ H*Q*H';
-            % smoothing Gain
+            if obj.noQ == true
+                R1 = R;
+            else
+                R1 = R+ H*Q*H';
+            end
+                % smoothing Gain
             dy = z.vec - y.vec;
             L = R1 + H1*P*H1';
             K = P*H1'/L;
@@ -91,7 +98,6 @@ classdef KF < DA
             P = P - K*H1*P;
             
             obj.P = P;
-            obj.R1 = R1;
             obj.x = x;
             obj.K = K;
         end
@@ -103,11 +109,17 @@ classdef KF < DA
             R = obj.R;
             z = fw.zt;
             
-            F = fw.getF(x);
-            x = fw.f(x);
-            H = fw.getH(x);
-            R1 = R + H*Q*H';
-            y = fw.h(x);
+            if obj.noQ == true
+                F = fw.getF(x);
+                x = fw.f(x);
+                P = F*P*F';
+            else
+                F = fw.getF(x);
+                x = fw.f(x);
+                H = fw.getH(x);
+                R1 = R + H*Q*H';
+                y = fw.h(x);
+            end
 
             %%%%%% scaling K %%%%%%
             K1 = Q*H'/R1;

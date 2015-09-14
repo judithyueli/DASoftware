@@ -19,6 +19,7 @@ classdef Saetrom < handle
         loc = [];   % m x nd matrix, location coordinates of each state variable
         method = ''; % algorithm name
         kernel;     % for initial covariance
+        seed;       % seed for generating realizations
     end
     
     methods
@@ -35,6 +36,7 @@ classdef Saetrom < handle
             obj.H = getH(obj,0);
             obj.method = param.method;
             obj.kernel = param.kernel;
+            obj.seed = param.seed;
 
             % Get geometry
             getLOC(obj);
