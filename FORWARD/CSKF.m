@@ -84,6 +84,7 @@ classdef CSKF < DA
             y = fw.h(x);
             H1A = obj.getFA(h1,A,x0,y);
             HA = obj.getFA(@fw.h,A,x,y);
+
             % innovation and Kalman gain
             eta = z.vec - y.vec;
             if obj.noQ == true
@@ -95,6 +96,7 @@ classdef CSKF < DA
             RR  = H1A*C';
             XX = LL'\RR;
             K = A*XX';
+            
             % update state and cov
             x0.vec = x0.vec + K*eta;
             C = C - XX'*H1A*C;
@@ -119,7 +121,7 @@ classdef CSKF < DA
                 y = fw.h(x);
                 FA = obj.getFA(@fw.f,A,x0,x);
                 AFA = A'*FA;
-                C = AFA*C*AFA' + V;
+                C = AFA*C*AFA';
             else
                 x0 = x;
                 h1 = @(x) fw.h(fw.f(x));
