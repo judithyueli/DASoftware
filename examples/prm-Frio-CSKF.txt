@@ -1,0 +1,14 @@
+method          CSKF
+model           Frio
+resolution      low
+N               300
+BasisType       rSVD
+nt              10
+theta_Q         1.14e-7
+theta_R         1e-5
+cov_type    	exponential
+cov_power      	0.5
+cov_len         900
+seed            100
+mexBBFMM        0
+mexfile_name    expfun       

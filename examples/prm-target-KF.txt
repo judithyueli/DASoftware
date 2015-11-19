@@ -1,0 +1,8 @@
+method          KF
+model           TargetTracking
+rate            3
+dt              1
+nt              100
+theta_Q         0.6
+theta_R         0.3
+seed            100

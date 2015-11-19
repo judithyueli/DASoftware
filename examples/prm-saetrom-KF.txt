@@ -1,0 +1,11 @@
+method          KF
+model           Saetrom
+m               100
+n               13
+nt              10
+x_std           20
+obsstd          1
+cov_type        exponential
+cov_power       1
+cov_len         6
+seed            10
