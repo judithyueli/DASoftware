@@ -32,7 +32,8 @@ Here we show a diagram of the methods provided in the library.
 <img src="./image/method_summary.png" alt="Drawing" style = "width: 600px;"/>
 
 |  Method  |  Assumptions                 |  Jacobian matrix|  Covariance matrix |   
-| -------: |:----------------------------:|:------------------------: |:--------------|   
+| -------: |:----------------------------:|:------------------------: |:--------------|
+|  KF      | only for small problem       | mn forward run| m^2 operations |
 |  HiKF    | fast data acquisition/fixed H| no forward run| O(m) operations |
 |          | random-walk forward model    | |  |
 |  CSKF    |    smooth problem            | r forward run | O(m) operations|
@@ -47,66 +48,56 @@ We have provided the users linear and nonlinear state estimation problems to get
 
 - Run a 1-D linear state estimation example (Sætrom & Omre 2011) with Kalman filter  
 ```
-[sol,true]=main('prm-saetrom.txt')
+[est,true,est_array,true_array]=main('examples/prm-saetrom-KF.txt')
+```
+- Example of user specified input in `prm-saetrom-KF.txt`
+```
+method          KF
+model           Saetrom
+m               100
+n               13
+nt              10
+x_std           20
+obsstd          1
+cov_type        exponential
+cov_power       1
+cov_len         6
+seed            10
 ```
 - Figure shows the mean and 95% confidence interval at intial and final time step.
 
 ![KF image](https://github.com/judithyueli/DASoftware/blob/master/image/KF-Saetrom.png)
 
-- Run the same problem using CSKF (Li et al. 2015) with __N = 50__ basis
+- Run the same problem using CSKF (Li et al. 2015) with __N = 20__ basis
 ```
-[sol,true]=main('prm-saetrom-cskf.txt')
+[est,true,est_array,true_array]=main('examples/prm-saetrom-CSKF.txt')
 ```
-- Example of user specified input
+- Example of user specified input in `prm-saetrom-CSKF.txt`
 ```
 method          CSKF
 model           Saetrom
-Nx		        100
-multi           1
-nRank           50
-BasisType       SVD
-Ny  	        13
-nSteps          10
-state_std      	20
-obs_std	        1
-cov_function    exponential
-cor_length      6
+N               20
+BasisType       rSVD
+m               100
+n               13
+nt              10
+x_std           20
+obsstd          1
+cov_type        exponential
+cov_power       1
+cov_len         6
 seed            10
-parentdir       './'
-version         0.0
 ```
-### Linear SSM: A simple scalar problem for Bayesian filtering
 
-
-<img src="./image/linearssm.png" alt="Drawing" style = "width: 600px;"/>
-
-- Example of user specified input
-
-```
-model           linearSSM
-F               5
-H               10
-Q 				1
-R 				1
-P 				1
-x 			    0.2
-z 				0.5
-method          KF/EKF/CSKF/EnKF
-EKFtype         EKF/sEKF/iEKF
-CSKFtype        CSKF/sCSKF
-nSteps		    1
-seed            200
-theta           [2 0.3]
-```
 ### Target tracking example
 Consider tracking an aircraft with an unknown constant maneuvering rate using a radar sensor (angle and bearing) yields a model with nonlinear dynamical and measurement equation. The unknown is the location, velocity and the turing rate.
 
 <img src="./image/target_tracking.png" alt="Drawing" style = "width: 600px;"/>
 
 ```
-[sol,true]=main('prm-target-KF.txt')
+[est,true,est_array,true_array]=main('examples/prm-target-KF.txt')
 ```
-- Example of user specified input
+- Example of user specified input in `prm-target-KF.txt`
 ```
 model           TargetTracking
 rate            3
@@ -119,9 +110,13 @@ theta_R         0.3
 ```
 
 ### Frio example
-A description of this example can be found in [Daley et al., 2011](#ref_co2) and [Li et al., 2014](#ref_h2).
+A description of this example can be found in [Daley et al., 2011](#ref_co2) and [Li et al., 2014](#ref_h2). Figure below shows how traveltime time-series signals recorded by sensors at different location can be used to constrain the position of a moving CO2 plume. With the computational efficiency provided by methods like HiKF, these sensor data can be processed in real-time to monitor potential CO2 leakage.
 <img src="./image/co2data.png" alt="Drawing" style = "width: 600px;"/>
-- Kalman gain
+
+```
+[est,true,est_array,true_array]=main('examples/prm-Frio-HiKF.txt')
+```
+
 - Example of user specified input
 ```
 model           Frio
@@ -139,7 +134,7 @@ mexfile_name    expfun
 ```
 
 #### Reference:
-1<a name="ref_h2"></a>. Judith Yue Li, Sivaram Ambikasaran, Eric F. Darve, Peter K. Kitanidis, A Kalman filter powered by H2-matrices for quasi-continuous data assimilation problems [link](https://www.dropbox.com/s/xxjdvixq7py4bhp/HiKF.pdf)
+1. Judith Yue Li, Sivaram Ambikasaran, Eric F. Darve, Peter K. Kitanidis, A Kalman filter powered by H2-matrices for quasi-continuous data assimilation problems [link](https://www.dropbox.com/s/xxjdvixq7py4bhp/HiKF.pdf)<a name="ref_h2"></a>
 
 2. Sivaram Ambikasaran, Judith Yue Li, Peter K. Kitanidis, Eric Darve, Large-scale stochastic linear inversion using hierarchical matrices, Computational Geosciences, December 2013, Volume 17, Issue 6, pp 913-927 [link](http://link.springer.com/article/10.1007%2Fs10596-013-9364-0)
 
@@ -152,7 +147,7 @@ assimilation (under review)
 
 5. Sætrom, J., & Omre, H. (2011). Ensemble Kalman filtering with shrinkage regression techniques. Computational Geosciences, 15(2), 271–292.
 
-6.<a name="ref_co2"></a> Daley, Thomas M and Ajo-Franklin, Jonathan B and Doughty, Christine, 2011. Constraining the reservoir model of an injected CO2 plume with crosswell CASSM at the Frio-II brine pilot, International Journal of Greenhouse Gas Control, 5(4), 1022-1030.
+6. Daley, Thomas M and Ajo-Franklin, Jonathan B and Doughty, Christine, 2011. Constraining the reservoir model of an injected CO2 plume with crosswell CASSM at the Frio-II brine pilot, International Journal of Greenhouse Gas Control, 5(4), 1022-1030.<a name="ref_co2"></a> 
 
 #### Acknowledgement
 We want to thank Dr Jonanthan Ajo-Franklin for providing us part of the data of Frio example.
