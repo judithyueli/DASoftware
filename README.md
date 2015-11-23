@@ -104,47 +104,42 @@ Consider tracking an aircraft with an unknown constant maneuvering rate using a 
 <img src="./image/target_tracking.png" alt="Drawing" style = "width: 600px;"/>
 
 ```
-[sol,true]=main('prm-saetrom-target-tracking.txt')
+[sol,true]=main('prm-target-KF.txt')
 ```
 - Example of user specified input
 ```
 model           TargetTracking
 rate            3
-rate_std        1e-4
 dt              1
-method          EKF/CSKF
-EKFtype         EKF/sEKF/iEKF
-CSKFtype        CSKF/sCSKF
-nSteps        	100
+method          KF
+nt        	    100
 seed            200
-theta           [2 0.3]
+theta_Q         0.6
+theta_R         0.3
 ```
 
 ### Frio example
-
-
+A description of this example can be found in [Daley et al., 2011](#ref_co2) and [Li et al., 2014](#ref_h2).
 <img src="./image/co2data.png" alt="Drawing" style = "width: 600px;"/>
 - Kalman gain
 - Example of user specified input
 ```
 model           Frio
-resolution      low/medium/high
-kernel          Exponential
-exp_power       0.5
-corrlength      900
-method          KF/HiKF/EnKF/CSKF
-sampling        soes/nrank/full	
-localization	no/bootstrap/covtaper
-CSKFtype        CSKF/sCSKF
-nRank           300
-nBootSamples    100
-nSteps          41
+resolution      low
+method          HiKF
+cov_type        exponential
+cov_power       0.5
+cov_length      900
+nt              41
 seed            200
-theta           [0.0114e-2 1e-5]
+theta_Q         1.14e-7
+theta_R         1e-5
+mexBBFMM        0
+mexfile_name    expfun
 ```
 
 #### Reference:
-1. Judith Yue Li, Sivaram Ambikasaran, Eric F. Darve, Peter K. Kitanidis, A Kalman filter powered by H2-matrices for quasi-continuous data assimilation problems [link](https://www.dropbox.com/s/xxjdvixq7py4bhp/HiKF.pdf)
+1<a name="ref_h2"></a>. Judith Yue Li, Sivaram Ambikasaran, Eric F. Darve, Peter K. Kitanidis, A Kalman filter powered by H2-matrices for quasi-continuous data assimilation problems [link](https://www.dropbox.com/s/xxjdvixq7py4bhp/HiKF.pdf)
 
 2. Sivaram Ambikasaran, Judith Yue Li, Peter K. Kitanidis, Eric Darve, Large-scale stochastic linear inversion using hierarchical matrices, Computational Geosciences, December 2013, Volume 17, Issue 6, pp 913-927 [link](http://link.springer.com/article/10.1007%2Fs10596-013-9364-0)
 
@@ -156,6 +151,11 @@ assimilation (under review)
 4. Judith Yue Li, A. Kokkinaki, H. Ghorbanidehno, E. Darve, and P. K. Kitanidis, 2015. The nonlinear compressed state Kalman filter for efficient large-scale reservoir monitoring, Submitted to Water Resources Research (under review)
 
 5. Sætrom, J., & Omre, H. (2011). Ensemble Kalman filtering with shrinkage regression techniques. Computational Geosciences, 15(2), 271–292.
+
+6.<a name="ref_co2"></a> Daley, Thomas M and Ajo-Franklin, Jonathan B and Doughty, Christine, 2011. Constraining the reservoir model of an injected CO2 plume with crosswell CASSM at the Frio-II brine pilot, International Journal of Greenhouse Gas Control, 5(4), 1022-1030.
+
+#### Acknowledgement
+We want to thank Dr Jonanthan Ajo-Franklin for providing us part of the data of Frio example.
 
 [ref2]: https://www.dropbox.com/s/3wrsljtlq0ub65p/KF-Saetrom.png?dl=0 "KF image"
 
