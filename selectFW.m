@@ -11,6 +11,8 @@ switch param.model
         fw = Frio(param);
     case 'TargetTracking'
         fw = TargetTracking(param);
+    case 'ScalarSSM'
+        fw = ScalarSSM(param);
     %add your own class
     otherwise
         error('foward model does not exist');

@@ -24,7 +24,7 @@ end
 %% Initialization
 % Map simulation parameters to FW subclass and create an object at time 0
 fw = selectFW(param);
-
+% Use mexBBFMM2D for covariance matrix multiplication
 if isfield(param,'mexBBFMM') && param.mexBBFMM == true
 %    construct kernelfun for fw.kernel
     addpath('./mexBBFMM2D/')
@@ -77,7 +77,8 @@ for i = 1:param.nt
     % save fw and da as snapshots for analysis
     
 end
-
-fw.visualize(fw_list,da_list)
+if ismethod(fw,'visualize')
+    fw.visualize(fw_list,da_list)
+end
 
 end
