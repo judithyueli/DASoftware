@@ -22,7 +22,7 @@ classdef CSKF < DA
             obj.BasisType = param.BasisType;
             obj.kernel = param.kernel;
             obj.nt = param.nt;
-            if isprop(param,'noQ')
+            if isfield(param,'noQ')
                 obj.noQ = param.noQ;
             end
             obj.m =  fw.m;

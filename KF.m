@@ -2,15 +2,15 @@ classdef KF < DA
     % Created on 18/03/2015 by Judith Li
     % Modified on 24/03/2015 by Judith Li
     properties
-        P; % state error covariance
-        Q; % model error covariance
-        R; % measurement error covariance
-        H; % measurement operator
-        F; % transition matrix
+        P;          % state error covariance
+        Q;          % model error covariance
+        R;          % measurement error covariance
+        H;          % measurement operator
+        F;          % transition matrix
         variance;
-        theta;  % hyperparameter controlling data fitting
-        smoothing; % option to process data one step ahead
-        noQ;
+        theta;      % hyperparameter controlling data fitting
+        smoothing;  % option to process data one step ahead
+        noQ;        % option for sKF
     end
     methods
         function obj = KF(param,fw)
@@ -30,7 +30,7 @@ classdef KF < DA
             obj.t_forecast = 0;
             obj.H = 5;
             obj.F = 1.2;
-            if isprop(param,'noQ')
+            if isfield(param,'noQ')
                 obj.noQ = param.noQ;
             end
                 % check
@@ -73,6 +73,7 @@ classdef KF < DA
             obj.t_forecast = obj.t_forecast + 1;
         end
         
+        % Methods for sKF
         function smooth(obj,fw)
             x = obj.x;
             R = obj.R;
@@ -102,6 +103,7 @@ classdef KF < DA
             obj.K = K;
         end
         
+        % Methods for sKF
         function forecast(obj,fw)
             x = obj.x;
             Q = obj.Q;
@@ -119,22 +121,20 @@ classdef KF < DA
                 H = fw.getH(x);
                 R1 = R + H*Q*H';
                 y = fw.h(x);
-            end
+                %%%%%% scaling K %%%%%%
+                K1 = Q*H'/R1;
+                %     K1 = Q*H'*Rs'/(Rs*R1*Rs')*Rs;
+                %%%%%%%%%%%%%%%%%%%%%%%
 
-            %%%%%% scaling K %%%%%%
-            K1 = Q*H'/R1;
-        %     K1 = Q*H'*Rs'/(Rs*R1*Rs')*Rs;
-            %%%%%%%%%%%%%%%%%%%%%%%
-
-            F1 = (eye(size(F))-K1*H)*F;
-            Q1 = Q - K1*R1*K1';
-        %     x = F1*x + K1*y;
-            x.vec = x.vec + K1*(z.vec-y.vec);
-            P = F1*P*F1' + Q1;
-            
+                F1 = (eye(size(F))-K1*H)*F;
+                Q1 = Q - K1*R1*K1';
+            %     x = F1*x + K1*y;
+                x.vec = x.vec + K1*(z.vec-y.vec);
+                P = F1*P*F1' + Q1;
+                obj.K = K1;
+            end            
             obj.P = P;
             obj.x = x;
-            obj.K = K1;
         end
         
         function obj = addRegularization(obj,param)
