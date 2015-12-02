@@ -55,8 +55,8 @@ classdef Saetrom < handle
             % compute true observation z
             Hmtx = obj.H;
             noise = sqrt(obj.obsvar)*randn(size(obj.n,1));
-            z.noisefree = Hmtx*x.vec;
-            z.vec = Hmtx*x.vec + noise; % todo: add noise
+            z.noisefree = Hmtx*xnew.vec;
+            z.vec = z.noisefree + noise; % todo: add noise
             obj.F = Fmtx;
             obj.xt = xnew;
             obj.zt = z;
