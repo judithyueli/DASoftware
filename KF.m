@@ -54,6 +54,7 @@ classdef KF < DA
             obj.P = P;
             obj.variance = diag(P);
             obj.K = K;
+            obj.H = H;
             obj.t_assim = obj.t_assim + 1;
             %fw.xt = obj.x;
         end
@@ -69,6 +70,7 @@ classdef KF < DA
             
             obj.x = x; % note that it changes fw.F and fw.x
             obj.P = P;
+            obj.F = F;
             obj.variance = diag(obj.P);
             obj.t_forecast = obj.t_forecast + 1;
         end
@@ -101,6 +103,8 @@ classdef KF < DA
             obj.P = P;
             obj.x = x;
             obj.K = K;
+            obj.F = F;
+            obj.H = H;
         end
         
         % Methods for sKF
@@ -132,9 +136,11 @@ classdef KF < DA
                 x.vec = x.vec + K1*(z.vec-y.vec);
                 P = F1*P*F1' + Q1;
                 obj.K = K1;
+                obj.H = H;
             end            
             obj.P = P;
             obj.x = x;
+            obj.F = F;
         end
         
         function obj = addRegularization(obj,param)

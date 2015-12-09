@@ -56,4 +56,10 @@ classdef ScalarSSM < handle
             H = obj.H;
         end
     end
+    
+    methods
+        da = initializeSSM(obj,da,param);
+        % initialize state space model(SSM) of Saetrom for a given filter
+        % type (KF,HiKF,CSKF)
+    end
 end

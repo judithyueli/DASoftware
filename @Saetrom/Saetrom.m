@@ -185,7 +185,7 @@ classdef Saetrom < handle
     
     methods
         da = initializeSSM(obj,da,param);
-        % initialize state space model(SSM) of Frio for a given filter
+        % initialize state space model(SSM) of Saetrom for a given filter
         % type (KF,HiKF,CSKF)
     end
 end

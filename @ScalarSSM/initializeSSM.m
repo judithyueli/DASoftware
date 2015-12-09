@@ -23,7 +23,12 @@ end
 
 if isprop(kf,'H')
     % measurement operator H
-	kf.H = obj.H;
+	kf.H = param.H;
+end
+
+if isprop(kf,'F')
+    % measurement operator H
+	kf.F =param.F;
 end
 
 if isprop(kf,'K')
