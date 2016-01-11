@@ -11,13 +11,16 @@ classdef KF < DA
         theta;      % hyperparameter controlling data fitting
         smoothing;  % option to process data one step ahead
         noQ;        % option for sKF
+        dy;         % innovation
+        dy_norm;    % normalized innovation
+        M2;
     end
     methods
         function obj = KF(param,fw)
             % method specific initialization
             % cases1 is an instance of the MODEL class (Saetrom, etc..)
 %             obj.kernel = param.kernel;
-            rng(101);
+            rng(param.seed);
             obj.x.vec = 0.5;
             obj.P = 0.5;
             obj.variance = diag(obj.P);
@@ -47,14 +50,19 @@ classdef KF < DA
             y = fw.h(x);
             % Calculate Kalman Gain
             PHT = P*H';
-            K = PHT/(H*PHT+R);
+            L = H*PHT + R;
+            K = PHT/L;
             % Update posterior covariance using Ricatti equation
             P = P - K*PHT';
-            obj.x.vec = obj.x.vec + K*(z.vec-y.vec);
+            dy = z.vec - y.vec;
+            obj.x.vec = obj.x.vec + K*dy;
             obj.P = P;
             obj.variance = diag(P);
             obj.K = K;
             obj.H = H;
+            obj.dy = dy;
+            [U,S,~] = svd(L);
+            obj.dy_norm = inv(sqrt(S))*U'*obj.dy;
             obj.t_assim = obj.t_assim + 1;
             %fw.xt = obj.x;
         end
@@ -68,7 +76,7 @@ classdef KF < DA
             x = fw.f(x);
             P = F*P*F' + Q;
             
-            obj.x = x; % note that it changes fw.F and fw.x
+            obj.x = x; 
             obj.P = P;
             obj.F = F;
             obj.variance = diag(obj.P);
@@ -93,7 +101,10 @@ classdef KF < DA
             else
                 R1 = R+ H*Q*H';
             end
-                % smoothing Gain
+            
+            obj.M2 = H1*H1'/R1;
+
+            % smoothing Gain
             dy = z.vec - y.vec;
             L = R1 + H1*P*H1';
             K = P*H1'/L;
@@ -105,6 +116,9 @@ classdef KF < DA
             obj.K = K;
             obj.F = F;
             obj.H = H;
+            obj.dy = dy;
+            [U,S,~] = svd(L);
+            obj.dy_norm = inv(sqrt(S))*U'*obj.dy;
         end
         
         % Methods for sKF
