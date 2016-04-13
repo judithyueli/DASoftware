@@ -40,15 +40,58 @@ Here we show a diagram of the methods provided in the library.
 |  SpecKF  | approximate uncertainty/fixed H| p forward run|  O(m) operations|
 |  EnKF    | monte carlo based approach   | r forward run | O(m) operations|
 
-## Start with examples
+## Quick Start Guide
+To get you up and running DASoftware
 
-We have provided the users linear and nonlinear state estimation problems to get familier with data assimilation methods provided in the library. All the built-in examples can be operated using a simple one-line code with an input file (*.txt) including all the assimilation parameters.  
+### Prerequisites
+This Quick Start Guide assumes that you have the following already installed:
+- mexBBFMM2D: see the [Quick Start Guide](https://github.com/judithyueli/mexBBFMM2D) for mexBBFMM2D for installing MEX and other dependent libraries. This library is required to run Frio example.
+- git: a version control tool
+ 
+## Start with examples
+- Download the package by entering the following code in your command line
+```
+git clone https://github.com/judithyueli/DASoftware.git
+```
+- Obtain data from [here](https://www.dropbox.com/sh/si51wciwelz48gf/AAD7CteomIkdaDhBc6cyfMAEa?dl=0) and put it in the directory `/DASoftware/data`
+
+We have provided the users linear and nonlinear state estimation problems to get familier with data assimilation methods provided in the library. All the built-in examples can be operated using a simple one-line code with an input file (*.txt) including all the assimilation parameters. To run an example, go to the main folder `/DASoftware` containing `main.m` and type the following code in MATLAB 
+```
+[est,true,est_array,true_array] = main(example_txt_file_name);
+```
+Input:
+
+`example_txt_file_name` is the name of the input text file under the folder `\example` containing the following field
+- `method`: name of the Kalman filter method, e.g., `KF`, `CSKF`, `HiKF`
+- `model`: name of the built in example, e.g., `Saetrom`, `TargetTracking`, `Frio`
+- `m`: number of unknown state variables
+- `n`: number of observed variables
+- `nt`: total assimialtion time steps
+- `x_std`: initial state standard deviation
+- `cov_type`: state covariance type, e.g., `exponential`, `Gaussian`, state covariance is specified through a covariance function with two hyperparameters, i.e., power given by `cov_power` and length scale given by `cov_len`
+- `BasisType`: a field required for method `CSKF` specifying the dimension reduction type, e.g., the randomized SVD approach `rSVD`
+- `mexBBFMM`: optional for the `Frio` example. If `mexBBFMM = 1` a fast linear algebraic package is used to accelerate the Kalman filter. Default is `0`
+
+Output:
+
+`est`: an object containing the Kalman filter estimate at the final assimilation step. Visit the class definition for more information.
+- `est.x`: a structure containing the value of the estimated state as a vector
+- `est.P`: the covariance matrix at the final assimilation step
+
+`true`: an object containing the properties of the true state at the final assimilation step. Visit the class definition for more information.
+- `true.xt`: a structure containing the value of the true state as a vector
+- `true.zt`: a structure containing the true observation as a vector
+
+`est_array`: a cell array of structures containing the estimated state given by Kalman filter at each assimilation step
+
+`true_array`: a cell array of structures containing the true state at each assimilation step
+
 
 ### 1D Saetrom example
 
 - Run a 1-D linear state estimation example (Sætrom & Omre 2011) with Kalman filter  
 ```
-[est,true,est_array,true_array]=main('examples/prm-saetrom-KF.txt')
+[est,true,est_array,true_array]=main('examples/prm-saetrom-KF.txt');
 ```
 - Example of user specified input in `prm-saetrom-KF.txt`
 ```
@@ -70,7 +113,7 @@ seed            10
 
 - Run the same problem using CSKF (Li et al. 2015) with __N = 20__ basis
 ```
-[est,true,est_array,true_array]=main('examples/prm-saetrom-CSKF.txt')
+[est,true,est_array,true_array]=main('examples/prm-saetrom-CSKF.txt');
 ```
 - Example of user specified input in `prm-saetrom-CSKF.txt`
 ```
@@ -90,12 +133,12 @@ seed            10
 ```
 
 ### Target tracking example
-Consider tracking an aircraft with an unknown constant maneuvering rate using a radar sensor (angle and bearing) yields a model with nonlinear dynamical and measurement equation. The unknown is the location, velocity and the turing rate.
+Consider tracking an aircraft with an unknown constant maneuvering rate using a radar sensor (angle and bearing) yields a model with nonlinear dynamical and measurement equation. The unknown is the location, velocity and the turing rate. 
 
 <img src="./image/target_tracking.png" alt="Drawing" style = "width: 600px;"/>
 
 ```
-[est,true,est_array,true_array]=main('examples/prm-target-KF.txt')
+[est,true,est_array,true_array]=main('examples/prm-target-KF.txt');
 ```
 - Example of user specified input in `prm-target-KF.txt`
 ```
@@ -114,23 +157,43 @@ A description of this example can be found in [Daley et al., 2011](#ref_co2) and
 <img src="./image/co2data.png" alt="Drawing" style = "width: 600px;"/>
 
 ```
-[est,true,est_array,true_array]=main('examples/prm-Frio-HiKF.txt')
+[est,true,est_array,true_array]=main('examples/prm-Frio-HiKF.txt');
 ```
 
-- Example of user specified input
+- Example of user specified input for a low resolution case containing 3245 unknowns.
 ```
+method          HiKF
 model           Frio
 resolution      low
-method          HiKF
-cov_type        exponential
-cov_power       0.5
-cov_length      900
-nt              41
-seed            200
+nt              40
 theta_Q         1.14e-7
 theta_R         1e-5
+cov_type    	exponential
+cov_power      	0.5
+cov_len         900
+seed            100
 mexBBFMM        0
-mexfile_name    expfun
+mexfile_name    expfun       
+```
+- To run a higher resolution case containing 12753 unknowns, run the following code, this may take a few minutes to compile 
+```
+[est,true,est_array,true_array]=main('examples/prm-Frio-HiKF-M.txt');
+```
+- Details of the `prm-Frio-HiKF.txt`. Note that `mexBBFMM = 1` in order to call the mexBBFMM2D package.
+
+```
+method          HiKF
+model           Frio
+resolution      medium
+nt              40
+theta_Q         1.14e-7
+theta_R         1e-5
+cov_type    	exponential
+cov_power      	0.5
+cov_len         900
+seed            100
+mexBBFMM        1
+mexfile_name    expfun  
 ```
 
 #### Reference:
